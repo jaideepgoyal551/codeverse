@@ -132,10 +132,7 @@ const startServer = async () => {
     // Without a running worker, reminders will be queued but never delivered.
     const emailOk = await verifyEmailConfig();
     if (!emailOk) {
-      console.warn('⚠️ Email configuration is not valid. Contest reminder emails may not be delivered.');
-      if ((process.env.NODE_ENV || 'development') === 'production') {
-        throw new Error('Email configuration invalid in production; refusing to start');
-      }
+      console.warn('⚠️ Email configuration is not valid. Email features will be disabled.');
     }
 
     if (process.env.EMAIL_WORKER_AUTOSTART !== 'false') {
