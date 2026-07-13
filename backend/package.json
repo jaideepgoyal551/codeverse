@@ -1,0 +1,52 @@
+{
+  "name": "codeverse-backend",
+  "version": "1.0.0",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "worker": "node src/workers/syncWorker.js",
+    "worker:dev": "nodemon src/workers/syncWorker.js",
+    "worker:email:bull": "node src/workers/emailBullWorkerRunner.js",
+    "worker:email:mongo": "node src/workers/emailMongoWorker.js"
+  },
+  "keywords": [
+    "coding",
+    "platform",
+    "analytics",
+    "leetcode",
+    "github"
+  ],
+  "author": "",
+  "license": "ISC",
+  "description": "Backend for CodeVerse - A comprehensive coding platform analytics tool",
+  "dependencies": {
+    "@sendgrid/mail": "^8.1.5",
+    "axios": "^1.13.2",
+    "bcrypt": "^6.0.0",
+    "bullmq": "^5.71.0",
+    "cheerio": "^1.1.2",
+    "compression": "^1.8.1",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^4.19.2",
+    "express-rate-limit": "^7.5.1",
+    "ioredis": "^5.10.1",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.1.4",
+    "multer": "^2.0.2",
+    "node-cache": "^5.1.2",
+    "node-cron": "^3.0.3",
+    "nodemailer": "^8.0.0",
+    "passport": "^0.7.0",
+    "passport-github2": "^0.1.12",
+    "passport-google-oauth20": "^2.0.0",
+    "puppeteer": "^24.36.1",
+    "slugify": "^1.6.6",
+    "socket.io": "^4.8.3",
+    "winston": "^3.19.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.13"
+  }
+}

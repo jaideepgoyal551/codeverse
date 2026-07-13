@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CodeVerse</title>
+    <script>
+      // Apply theme before page renders to prevent flash
+      (function() {
+        const theme = localStorage.getItem('theme') || 'dark';
+        document.documentElement.classList.remove('light', 'dark');
+        document.documentElement.classList.add(theme);
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root">
+      <div id="initial-splash" style="position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:#0B0F1A;transition:opacity .4s">
+        <div style="text-align:center">
+          <div style="margin-bottom:2rem;display:flex;justify-content:center">
+            <div style="position:relative">
+              <div style="width:80px;height:80px;border-radius:16px;background:linear-gradient(135deg,#f59e0b,#9333ea);display:flex;align-items:center;justify-content:center;box-shadow:0 25px 50px -12px rgba(245,158,11,.25)">
+                <span style="font-size:2.25rem;font-weight:700;color:white">&lt;/&gt;</span>
+              </div>
+            </div>
+          </div>
+          <h1 style="font-size:2.25rem;font-weight:700;color:white;margin-bottom:.5rem;letter-spacing:-.025em">CodeVerse</h1>
+          <p style="color:#9ca3af;font-size:1.125rem;margin-bottom:2.5rem">Unified Competitive Programming Hub</p>
+          <p style="color:#f59e0b;font-weight:500;margin-bottom:1rem;font-size:.875rem">Loading<span id="splash-dots">...</span></p>
+          <div style="width:256px;margin:0 auto;height:6px;background:#1f2937;border-radius:9999px;overflow:hidden">
+            <div id="splash-bar" style="height:100%;width:0%;background:linear-gradient(90deg,#f59e0b,#9333ea);border-radius:9999px;transition:width .5s"></div>
+          </div>
+        </div>
+      </div>
+      <script>
+        (function(){
+          var dotsEl = document.getElementById('splash-dots');
+          var barEl = document.getElementById('splash-bar');
+          if (dotsEl) {
+            var dots = '';
+            setInterval(function(){ dots = dots.length >= 3 ? '' : dots + '.'; if (dotsEl) dotsEl.textContent = dots; }, 400);
+          }
+          if (barEl) {
+            var w = 0;
+            var intv = setInterval(function(){ w = Math.min(w + Math.random() * 8, 92); if (barEl) barEl.style.width = w + '%'; }, 600);
+            window.addEventListener('load', function(){ setTimeout(function(){ clearInterval(intv); if (barEl) barEl.style.width = '100%'; setTimeout(function(){ var el = document.getElementById('initial-splash'); if(el) el.style.opacity = '0'; }, 300); }, 1500); });
+          }
+        })();
+      </script>
+    </div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
