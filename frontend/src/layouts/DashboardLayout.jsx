@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Navbar from './Navbar';
@@ -8,13 +8,12 @@ const DashboardLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(() => window.innerWidth >= 1280);
   const { user, logout } = useAuth();
 
-  // Keep sidebar in sync when the window is resized (e.g. DevTools responsive mode)
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth >= 1280) {
-        setSidebarOpen(true);   // always open on desktop
+        setSidebarOpen(true);
       } else {
-        setSidebarOpen(false);  // always close on mobile
+        setSidebarOpen(false);
       }
     };
     window.addEventListener('resize', handleResize);
@@ -29,17 +28,17 @@ const DashboardLayout = () => {
   const toggleSidebar = () => setSidebarOpen(prev => !prev);
 
   return (
-    <div className="flex h-screen bg-gray-50 dark:bg-[#0d0d14] transition-colors">
+    <div className="flex h-screen bg-[#05070d] text-white transition-colors">
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} onToggle={toggleSidebar} />
-      
+
       <div className="flex-1 flex flex-col overflow-hidden">
-        <Navbar 
-          user={user} 
+        <Navbar
+          user={user}
           onMenuClick={toggleSidebar}
           onLogout={handleLogout}
         />
-        
-        <main className="flex-1 overflow-y-auto custom-scrollbar bg-gray-50 dark:bg-[#0d0d14] p-4 md:p-6 xl:p-8 transition-colors">
+
+        <main className="flex-1 overflow-y-auto custom-scrollbar bg-[#05070d] p-4 md:p-6 xl:p-8 transition-colors">
           <Outlet />
         </main>
       </div>
