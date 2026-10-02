@@ -1,18 +1,16 @@
-import React, { useState, useEffect, useMemo, lazy, Suspense } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import PLATFORM_CONFIG, { PlatformIcon, getPlatformColor } from '../utils/platformConfig';
 import { 
   Code, 
-  ExternalLink,
-  Check,
   MapPin,
   Building,
   RefreshCw,
   ChevronRight,
   BookOpen,
-  ChevronDown,
   Users,
-  Zap
+  Zap,
+  Trophy
 } from 'lucide-react';
 const RatingChart = lazy(() => import('../components/dashboard/RatingChart'));
 import api from '../services/api';
@@ -70,9 +68,6 @@ const Dashboard = () => {
   const [ratingHistory, setRatingHistory] = useState([]);
   const [allRatingHistory, setAllRatingHistory] = useState({ chartData: [], platforms: [] });
   const [cooldownRemaining, setCooldownRemaining] = useState(0); // seconds remaining
-  const [showPlatformStats, setShowPlatformStats] = useState(false);
-  const [openProblemStats, setOpenProblemStats] = useState(true);
-  const [openDevStats, setOpenDevStats] = useState(true);
   const [selectedRatingPlatform, setSelectedRatingPlatform] = useState('all'); // 'all' or specific platform
   const [topicAnalysis, setTopicAnalysis] = useState([]);
   const [badges, setBadges] = useState([]);
@@ -423,8 +418,8 @@ const Dashboard = () => {
 
   if (loading) {
   return (
-      <div className="min-h-screen bg-white dark:bg-[#0d0d14] flex items-center justify-center transition-colors">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-amber-500"></div>
+      <div className="flex min-h-full items-center justify-center bg-[#05070a] transition-colors">
+        <div className="h-10 w-10 animate-spin rounded-full border-2 border-[#1c2b22] border-t-[#4ade80]"></div>
       </div>
     );
   }
@@ -432,10 +427,10 @@ const Dashboard = () => {
   // Empty state for new users
   if (!connectedPlatforms.length) {
   return (
-      <div className="min-h-full bg-white dark:bg-[#0d0d14] transition-colors">
+      <div className="min-h-full bg-[#05070a] transition-colors">
         <div className="max-w-2xl mx-auto text-center py-20">
-          <div className="w-24 h-24 mx-auto mb-6 bg-amber-500/10 rounded-full flex items-center justify-center">
-            <Code className="w-12 h-12 text-amber-500" />
+          <div className="w-24 h-24 mx-auto mb-6 bg-[#22c55e]/10 rounded-full flex items-center justify-center">
+            <Code className="w-12 h-12 text-[#4ade80]" />
           </div>
           <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">Welcome to CodeVerse!</h2>
           <p className="text-gray-600 dark:text-gray-400 mb-8 text-lg">
@@ -443,7 +438,7 @@ const Dashboard = () => {
           </p>
           <button
             onClick={() => navigate('/settings')}
-            className="bg-amber-500 hover:bg-amber-600 text-black font-semibold px-8 py-3 rounded-lg text-lg transition-colors"
+            className="bg-[#22c55e] hover:bg-[#4ade80] text-[#06100a] font-semibold px-8 py-3 rounded-lg text-lg transition-colors"
           >
             Connect Your Platforms
           </button>
@@ -453,77 +448,65 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-full bg-white dark:bg-[#0d0d14] text-gray-900 dark:text-white transition-colors">
-      <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-12 gap-4 sm:gap-6">
-          
-          {/* Left Column - Profile Section */}
+    <div className="dashboard-page min-h-full text-gray-900 dark:text-white transition-colors">
+      <div className="dashboard-content">
           <ProfileSection
             displayUser={displayUser}
             connectedPlatforms={connectedPlatforms}
             isOwnProfile={isOwnProfile}
-            openProblemStats={openProblemStats}
-            setOpenProblemStats={setOpenProblemStats}
-            openDevStats={openDevStats}
-            setOpenDevStats={setOpenDevStats}
             navigate={navigate}
             getPlatformUrl={getPlatformUrl}
           />
 
-          {/* Middle Column - Stats & Charts */}
-          <div className="col-span-12 lg:col-span-6 space-y-6">
-            {/* Stats Cards Row */}
+          <div className="grid grid-cols-12 gap-4 sm:gap-5">
+            <div className="col-span-12 lg:col-span-8 space-y-4 sm:space-y-5">
+              <div className="grid gap-4 xl:grid-cols-[1.2fr_0.8fr]">
             <StatsRow totalProblems={totalProblems} activeDays={contributionCalendar?.stats?.activeDays || userData?.totals?.activeDays || 0} />
-
-            {/* Contribution Calendar */}
-            <div className="bg-white dark:bg-[#16161f] rounded-xl p-4 sm:p-6 border border-gray-200 dark:border-gray-800 shadow-sm transition-colors">
-              <ContributionCalendar calendarData={contributionCalendar} connectedPlatforms={connectedPlatforms} />
-            </div>
-
-            {/* Total Contests */}
-            <ContestsSection totalContests={totalContests} contestsByPlatform={contestsByPlatform} PlatformIcon={PlatformIcon} getPlatformColor={getPlatformColor} />
-
-            {/* Rating Chart - Multi-Platform (Codolio Style) */}
-            <Suspense fallback={<div className="bg-white dark:bg-[#16161f] border border-gray-200 dark:border-gray-800 rounded-xl p-4 h-64 flex items-center justify-center text-gray-500">Loading chart...</div>}>
-              <RatingChart 
-                ratingHistory={ratingHistory}
-                allRatingHistory={allRatingHistory}
-                selectedRatingPlatform={selectedRatingPlatform}
-                setSelectedRatingPlatform={setSelectedRatingPlatform}
-                platformStats={platformStats}
-                platformRatingColors={platformRatingColors}
-              />
-            </Suspense>
-
-            {/* Sheets Section Promo */}
-            <div 
-              onClick={() => navigate('/sheets')}
-              className="bg-gradient-to-r from-amber-500/20 to-orange-500/20 rounded-xl p-6 border border-amber-500/30 cursor-pointer hover:border-amber-500/50 transition-all"
-            >
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-amber-500 rounded-lg flex items-center justify-center">
-                  <BookOpen className="w-6 h-6 text-black" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">DSA Sheets</h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Track your progress on popular DSA sheets like Striver's A to Z</p>
-                </div>
-                <ChevronRight className="w-6 h-6 text-amber-500" />
+                <ContestsSection totalContests={totalContests} contestsByPlatform={contestsByPlatform} PlatformIcon={PlatformIcon} getPlatformColor={getPlatformColor} />
               </div>
+
+              <div className="dashboard-card dashboard-heatmap-card">
+              <ContributionCalendar calendarData={contributionCalendar} connectedPlatforms={connectedPlatforms} />
+              </div>
+
+              <div className="grid gap-4 xl:grid-cols-[1.35fr_0.9fr]">
+                <Suspense fallback={<div className="dashboard-card flex h-64 items-center justify-center text-gray-500">Loading chart...</div>}>
+                  <RatingChart 
+                    ratingHistory={ratingHistory}
+                    allRatingHistory={allRatingHistory}
+                    selectedRatingPlatform={selectedRatingPlatform}
+                    setSelectedRatingPlatform={setSelectedRatingPlatform}
+                    platformStats={platformStats}
+                    platformRatingColors={platformRatingColors}
+                  />
+                </Suspense>
+                <ProblemsBreakdown platformStats={platformStats} dsaProblems={dsaProblems} cpProblems={cpProblems} PLATFORM_CONFIG={PLATFORM_CONFIG} PlatformIcon={PlatformIcon} />
+              </div>
+
+              <div 
+                onClick={() => navigate('/sheets')}
+                className="dashboard-promo-card cursor-pointer transition-all"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#22c55e] text-[#06100a]">
+                    <BookOpen className="h-5 w-5" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-base font-semibold text-white">DSA Sheets</h3>
+                    <p className="text-sm text-gray-400">Keep your progress moving with a structured problem roadmap.</p>
+                  </div>
+                  <ChevronRight className="h-5 w-5 text-[#4ade80]" />
+                </div>
+              </div>
+
+              <TopicAnalysisSection topicAnalysis={topicAnalysis} navigate={navigate} PLATFORM_CONFIG={PLATFORM_CONFIG} PlatformIcon={PlatformIcon} />
             </div>
 
-            {/* DSA Topic Analysis */}
-            <TopicAnalysisSection topicAnalysis={topicAnalysis} navigate={navigate} PLATFORM_CONFIG={PLATFORM_CONFIG} PlatformIcon={PlatformIcon} />
-
+            <aside className="col-span-12 space-y-4 lg:col-span-4 sm:space-y-5">
+              <SyncButtonSection isOwnProfile={isOwnProfile} syncing={syncing} cooldownRemaining={cooldownRemaining} handleSync={handleSync} formatCooldown={formatCooldown} SYNC_COOLDOWN_MS={SYNC_COOLDOWN_MS} getSyncKey={getSyncKey} />
+              <QuickLinksSection navigate={navigate} />
+            </aside>
           </div>
-
-          {/* Right Column - Problem Breakdown */}
-          <div className="col-span-12 lg:col-span-3 space-y-6">
-            <ProblemsBreakdown platformStats={platformStats} dsaProblems={dsaProblems} cpProblems={cpProblems} PLATFORM_CONFIG={PLATFORM_CONFIG} PlatformIcon={PlatformIcon} />
-            <SyncButtonSection isOwnProfile={isOwnProfile} syncing={syncing} cooldownRemaining={cooldownRemaining} handleSync={handleSync} formatCooldown={formatCooldown} SYNC_COOLDOWN_MS={SYNC_COOLDOWN_MS} getSyncKey={getSyncKey} />
-            <QuickLinksSection navigate={navigate} />
-          </div>
-        </div>
       </div>
     </div>
   );
@@ -531,135 +514,104 @@ const Dashboard = () => {
 
 // ============== Extracted Dashboard Sub-Components ==============
 
-const ProfileSection = React.memo(({ displayUser, connectedPlatforms, isOwnProfile, openProblemStats, setOpenProblemStats, openDevStats, setOpenDevStats, navigate, getPlatformUrl }) => (
-  <div className="col-span-12 lg:col-span-3">
-    <div className="bg-white dark:bg-[#16161f] rounded-xl p-4 sm:p-6 border border-gray-200 dark:border-gray-800 shadow-sm transition-colors">
-      <div className="flex flex-col items-center mb-6">
-        <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 p-1 mb-4">
-          <div className="w-full h-full rounded-full bg-gray-100 dark:bg-[#1a1a2e] flex items-center justify-center overflow-hidden transition-colors">
-            {displayUser?.avatar ? (
-              <img src={displayUser.avatar} alt="avatar" className="w-full h-full object-cover" />
-            ) : (
-              <span className="text-4xl">{displayUser?.fullName?.[0] || displayUser?.username?.[0] || '👤'}</span>
-            )}
+const ProfileSection = React.memo(({ displayUser, connectedPlatforms, isOwnProfile, navigate, getPlatformUrl }) => (
+  <section className="dashboard-profile-card">
+    <div className="dashboard-profile-top">
+      <div className="flex min-w-0 items-center gap-4">
+        <div className="dashboard-avatar">
+          {displayUser?.avatar ? (
+            <img src={displayUser.avatar} alt="" className="h-full w-full object-cover" />
+          ) : (
+            <span>{displayUser?.fullName?.[0] || displayUser?.username?.[0] || 'U'}</span>
+          )}
+        </div>
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-2">
+            <h2 className="truncate text-xl font-bold text-white">{displayUser?.fullName || 'Coder'}</h2>
+            <span className="text-amber-300" aria-label="Verified profile">★</span>
+            <span className="text-sm" aria-label="Active">🟢</span>
+          </div>
+          <p className="mt-1 text-sm text-gray-400">@{displayUser?.username || 'coder'}</p>
+          <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-gray-400">
+            {displayUser?.location && <span className="flex items-center gap-1.5"><MapPin className="h-3.5 w-3.5" />{displayUser.location}</span>}
+            {displayUser?.institution && <span className="flex items-center gap-1.5"><Building className="h-3.5 w-3.5" />{displayUser.institution}</span>}
+            <span className="flex items-center gap-1.5"><Code className="h-3.5 w-3.5 text-[#4ade80]" />Competitive programmer</span>
           </div>
         </div>
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white">{displayUser?.fullName || 'User'}</h2>
-        <p className="text-amber-500 text-sm flex items-center gap-1">
-          <span>@{displayUser?.username}</span> <Check className="w-4 h-4 text-green-500" />
-        </p>
       </div>
       {isOwnProfile && (
-        <button
-          onClick={() => navigate('/settings')}
-          className="w-full bg-gradient-to-r from-amber-500 to-orange-500 text-black font-semibold py-2.5 rounded-lg mb-4 hover:from-amber-600 hover:to-orange-600 transition-all"
-        >
+        <button onClick={() => navigate('/settings')} className="dashboard-outline-button">
           Edit Profile
         </button>
       )}
-      <div className="border-t border-gray-200 dark:border-gray-700 my-4"></div>
-      <div className="space-y-3 mb-4 text-sm">
-        {displayUser?.location && (
-          <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-            <MapPin className="w-4 h-4" />
-            <span>{displayUser.location}</span>
-          </div>
-        )}
-        {displayUser?.institution && (
-          <div className="flex items-center gap-2 text-gray-400">
-            <Building className="w-4 h-4" />
-            <span className="truncate">{displayUser.institution}</span>
-          </div>
-        )}
+      <div className="dashboard-quote">
+        <span className="dashboard-quote-mark">“</span>
+        <p>{displayUser?.bio || 'A little progress each day adds up to big results.'}</p>
       </div>
-      <div className="border-t border-gray-700 my-4"></div>
-      <div className="mb-4">
-        <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">About</h3>
-        <p className="text-sm text-gray-600 dark:text-gray-400">{displayUser?.bio || 'Passionate about competitive programming and software development.'}</p>
-      </div>
-      <div className="mb-4">
-        <button
-          onClick={() => setOpenProblemStats(prev => !prev)}
-          className="w-full flex items-center justify-between mb-2"
-        >
-          <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Problem Solving Stats</h3>
-          <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${openProblemStats ? 'rotate-180' : ''}`} />
-        </button>
-        {openProblemStats && (
-          <div className="space-y-2">
-            {connectedPlatforms.filter(p => p.key !== 'github').map(platform => (
-              <div key={platform.key} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-[#1a1a2e] rounded-lg border border-gray-200 dark:border-transparent transition-colors">
-                <div className="flex items-center gap-2">
-                  <PlatformIcon platform={platform.key} className="w-5 h-5" color={PLATFORM_CONFIG[platform.key]?.color} />
-                  <span className="text-sm text-gray-900 dark:text-white">{platform.name}</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <a href={getPlatformUrl(platform.key, platform.username)} target="_blank" rel="noopener noreferrer" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">
-                    <ExternalLink className="w-4 h-4" />
-                  </a>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-      <div className="mb-4">
-        <button
-          onClick={() => setOpenDevStats(prev => !prev)}
-          className="w-full flex items-center justify-between mb-2"
-        >
-          <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Development Stats</h3>
-          <ChevronDown className={`w-4 h-4 text-gray-600 dark:text-gray-400 transition-transform ${openDevStats ? 'rotate-180' : ''}`} />
-        </button>
-        {openDevStats && (
-          <div className="space-y-2">
-            {connectedPlatforms.filter(p => p.key === 'github').map(platform => (
-              <div key={platform.key} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-[#1a1a2e] rounded-lg border border-gray-200 dark:border-transparent transition-colors">
-                <div className="flex items-center gap-2">
-                  <PlatformIcon platform={platform.key} className="w-5 h-5" color={PLATFORM_CONFIG[platform.key]?.color} />
-                  <span className="text-sm text-gray-900 dark:text-white">{platform.name}</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <a href={getPlatformUrl(platform.key, platform.username)} target="_blank" rel="noopener noreferrer" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">
-                    <ExternalLink className="w-4 h-4" />
-                  </a>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-      <button onClick={() => navigate('/settings')} className="w-full text-center text-amber-500 text-sm py-2 hover:text-amber-400 transition-colors">
-        + Add Platform
-      </button>
     </div>
-  </div>
+
+    <div className="dashboard-platforms">
+      {connectedPlatforms.length > 0 ? connectedPlatforms.map(platform => {
+        const count = platform.stats.totalSolved || platform.stats.problemsSolved || 0;
+        const rating = platform.stats.rating || platform.stats.currentRating;
+        return (
+          <a
+            key={platform.key}
+            href={getPlatformUrl(platform.key, platform.username)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="dashboard-platform-card"
+          >
+            <div className="dashboard-platform-icon">
+              <PlatformIcon platform={platform.key} className="h-6 w-6" color={platform.color} />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-xs text-gray-400">{platform.name}</p>
+              <p className="mt-1 text-xl font-bold text-white">{rating ? Number(rating).toLocaleString() : Number(count).toLocaleString()}</p>
+              <p className="mt-1 text-[10px] text-gray-500">{rating ? 'Current rating' : 'Problems solved'}</p>
+            </div>
+            <ChevronRight className="h-4 w-4 text-gray-500" />
+          </a>
+        );
+      }) : (
+        <button onClick={() => navigate('/settings')} className="dashboard-add-platform">
+          + Connect your first coding platform
+        </button>
+      )}
+    </div>
+  </section>
 ));
 
 const StatsRow = React.memo(({ totalProblems, activeDays }) => (
   <div className="grid grid-cols-2 gap-3 sm:gap-4">
-    <div className="bg-white dark:bg-[#16161f] rounded-xl p-4 sm:p-6 border border-gray-200 dark:border-gray-800 shadow-sm transition-colors">
+    <div className="dashboard-card dashboard-stat-card">
       <p className="text-gray-600 dark:text-gray-400 text-sm mb-1">Total Questions</p>
-      <p className="text-2xl sm:text-4xl font-bold text-gray-900 dark:text-white">{totalProblems}</p>
+      <p className="dashboard-stat-value">{Number(totalProblems).toLocaleString()}</p>
+      <span className="dashboard-stat-note"><span className="dashboard-live-dot" /> Across connected platforms</span>
     </div>
-    <div className="bg-white dark:bg-[#16161f] rounded-xl p-4 sm:p-6 border border-gray-200 dark:border-gray-800 shadow-sm transition-colors">
+    <div className="dashboard-card dashboard-stat-card">
       <p className="text-gray-600 dark:text-gray-400 text-sm mb-1">Total Active Days</p>
-      <p className="text-2xl sm:text-4xl font-bold text-gray-900 dark:text-white">{activeDays}</p>
+      <p className="dashboard-stat-value">{Number(activeDays).toLocaleString()}</p>
+      <span className="dashboard-stat-note"><span className="dashboard-live-dot" /> Keep your streak alive</span>
     </div>
   </div>
 ));
 
 const ContestsSection = React.memo(({ totalContests, contestsByPlatform, PlatformIcon, getPlatformColor }) => (
-  <div className="bg-white dark:bg-[#16161f] rounded-xl p-4 sm:p-6 border border-gray-200 dark:border-gray-800 shadow-sm transition-colors">
-    <div className="flex flex-wrap items-start justify-between gap-4">
+  <div className="dashboard-card dashboard-contests-card">
+    <div className="flex items-center justify-between">
       <div>
-        <p className="text-gray-600 dark:text-gray-400 text-sm mb-2">Total Contests</p>
-        <p className="text-3xl sm:text-5xl font-bold text-gray-900 dark:text-white">{totalContests}</p>
+        <p className="text-xs uppercase tracking-wider text-gray-500">Contests entered</p>
+        <p className="mt-2 text-3xl font-bold text-white">{Number(totalContests).toLocaleString()}</p>
       </div>
-      <div className="space-y-3">
+      <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#22c55e]/10 text-[#4ade80]">
+        <Trophy className="h-5 w-5" />
+      </div>
+    </div>
+    <div className="mt-4 space-y-2 border-t border-white/5 pt-3">
         {contestsByPlatform.length > 0 ? (
           contestsByPlatform.map(item => (
-            <div key={item.platform} className="flex items-center justify-between gap-8">
+            <div key={item.platform} className="flex items-center justify-between gap-4">
               <div className="flex items-center gap-2">
                 <PlatformIcon platform={item.platform} className="w-4 h-4" color={getPlatformColor(item.platform)} />
                 <span className="text-sm text-gray-700 dark:text-gray-300">{item.name}</span>
@@ -668,16 +620,15 @@ const ContestsSection = React.memo(({ totalContests, contestsByPlatform, Platfor
             </div>
           ))
         ) : (
-          <p className="text-sm text-gray-400">Participate in contests to see breakdown</p>
+          <p className="text-xs text-gray-500">Participate to see platform breakdown</p>
         )}
-      </div>
     </div>
   </div>
 ));
 
 const TopicAnalysisSection = React.memo(({ topicAnalysis, navigate, PLATFORM_CONFIG, PlatformIcon }) => (
   topicAnalysis.length > 0 ? (
-    <div className="bg-white dark:bg-[#16161f] rounded-xl p-6 border border-gray-200 dark:border-gray-800 shadow-sm transition-colors">
+    <div className="dashboard-card p-5">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
           <Code className="w-5 h-5 text-amber-500" /> DSA Topic Analysis
@@ -690,7 +641,7 @@ const TopicAnalysisSection = React.memo(({ topicAnalysis, navigate, PLATFORM_CON
         {topicAnalysis.slice(0, 15).map((topic, idx) => {
           const maxCount = topicAnalysis[0]?.total || 1;
           const percentage = (topic.total / maxCount) * 100;
-          const barColors = ['#f59e0b', '#10b981', '#3b82f6', '#8b5cf6', '#ec4899'];
+          const barColors = ['#4ade80', '#22c55e', '#86efac', '#a3e635', '#34d399'];
           const barColor = barColors[idx % barColors.length];
           return (
             <div key={idx} className="group">
@@ -721,7 +672,7 @@ const TopicAnalysisSection = React.memo(({ topicAnalysis, navigate, PLATFORM_CON
       </div>
     </div>
   ) : (
-    <div className="bg-white dark:bg-[#16161f] rounded-xl p-6 border border-gray-200 dark:border-gray-800 transition-colors">
+    <div className="dashboard-card p-5">
       <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2 mb-4">
         <Code className="w-5 h-5 text-amber-500" /> DSA Topic Analysis
       </h3>
@@ -735,7 +686,7 @@ const TopicAnalysisSection = React.memo(({ topicAnalysis, navigate, PLATFORM_CON
 ));
 
 const ProblemsBreakdown = React.memo(({ platformStats, dsaProblems, cpProblems, PLATFORM_CONFIG, PlatformIcon }) => (
-  <div className="bg-white dark:bg-[#16161f] rounded-xl p-4 sm:p-6 border border-gray-200 dark:border-gray-800 transition-colors">
+  <div className="dashboard-card p-5">
     <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Problems Solved</h3>
     <div className="mb-6">
       <p className="text-sm text-gray-400 mb-3">Fundamentals</p>
@@ -753,7 +704,7 @@ const ProblemsBreakdown = React.memo(({ platformStats, dsaProblems, cpProblems, 
     <div className="mb-6">
       <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">DSA</p>
       <div className="flex items-center gap-4">
-        <CircularProgress value={dsaProblems.total} max={Math.max(dsaProblems.total + 50, 500)} size={80} strokeWidth={8} color="#f59e0b" />
+        <CircularProgress value={dsaProblems.total} max={Math.max(dsaProblems.total + 50, 500)} size={80} strokeWidth={8} color="#22c55e" />
         <div className="flex-1 space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-sm font-semibold text-green-500">Easy</span>
@@ -773,7 +724,7 @@ const ProblemsBreakdown = React.memo(({ platformStats, dsaProblems, cpProblems, 
     <div>
       <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">Competitive Programming</p>
       <div className="flex items-center gap-4">
-        <CircularProgress value={cpProblems.total} max={500} size={80} strokeWidth={8} color="#f59e0b" />
+        <CircularProgress value={cpProblems.total} max={500} size={80} strokeWidth={8} color="#22c55e" />
         <div className="flex-1 space-y-2">
           <div className="flex items-center gap-2">
             <PlatformIcon platform="codechef" className="w-5 h-5" color={PLATFORM_CONFIG['codechef']?.color} />
@@ -800,7 +751,7 @@ const SyncButtonSection = React.memo(({ isOwnProfile, syncing, cooldownRemaining
         className={`w-full font-semibold py-3 rounded-lg flex items-center justify-center gap-2 transition-colors ${
           cooldownRemaining > 0
             ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
-            : 'bg-amber-500 hover:bg-amber-600 disabled:bg-amber-500/50 text-black'
+            : 'bg-[#22c55e] hover:bg-[#4ade80] disabled:bg-[#22c55e]/50 text-[#06100a]'
         }`}
       >
         <RefreshCw className={`w-5 h-5 ${syncing ? 'animate-spin' : ''}`} />
@@ -812,7 +763,7 @@ const SyncButtonSection = React.memo(({ isOwnProfile, syncing, cooldownRemaining
       </button>
       {cooldownRemaining > 0 && (
         <div className="w-full bg-gray-800 rounded-full h-1.5 overflow-hidden">
-          <div className="h-full bg-amber-500/60 rounded-full transition-all duration-1000"
+          <div className="h-full bg-[#22c55e]/60 rounded-full transition-all duration-1000"
             style={{ width: `${((SYNC_COOLDOWN_MS / 1000 - cooldownRemaining) / (SYNC_COOLDOWN_MS / 1000)) * 100}%` }}
           />
         </div>
@@ -830,7 +781,7 @@ const SyncButtonSection = React.memo(({ isOwnProfile, syncing, cooldownRemaining
 ));
 
 const QuickLinksSection = React.memo(({ navigate }) => (
-  <div className="bg-white dark:bg-[#16161f] rounded-xl p-6 border border-gray-200 dark:border-gray-800 transition-colors">
+  <div className="dashboard-card p-5">
     <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Quick Links</h3>
     <div className="space-y-2">
       <button onClick={() => navigate('/platforms')} className="w-full text-left p-3 bg-gray-100 dark:bg-[#1a1a2e] rounded-lg hover:bg-gray-200 dark:hover:bg-[#252538] transition-colors flex items-center justify-between">
@@ -857,9 +808,4 @@ const getPlatformUrl = (platform, username) => {
 };
 
 export default Dashboard;
-
-
-
-
-
 

@@ -60,7 +60,7 @@ const Sidebar = ({ isOpen, onClose, onToggle }) => {
   const sections = [
     {
       id: 'profileTracker',
-      label: 'PROFILE TRACKER',
+      label: 'MAIN',
       items: [
       { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
         { to: '/platforms', icon: Code2, label: 'Platforms' },
@@ -77,7 +77,7 @@ const Sidebar = ({ isOpen, onClose, onToggle }) => {
     },
     {
       id: 'questionTracker',
-      label: 'QUESTION TRACKER',
+      label: 'PRACTICE',
       items: [
         { to: '/sheets', icon: BookOpen, label: 'DSA Sheets' },
         { to: '/daily-challenge', icon: Zap, label: 'Daily Challenge' },
@@ -86,7 +86,7 @@ const Sidebar = ({ isOpen, onClose, onToggle }) => {
     },
     {
       id: 'eventTracker',
-      label: 'EVENT TRACKER',
+      label: 'CONTESTS',
       items: [
         { to: '/contests', icon: Swords, label: 'Contests' },
         { to: '/contests/admin', icon: PlusCircle, label: 'Host Contest' },
@@ -102,7 +102,7 @@ const Sidebar = ({ isOpen, onClose, onToggle }) => {
       className={({ isActive }) => `
         flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200
         ${isActive 
-          ? 'bg-amber-500/15 text-amber-500' 
+          ? 'bg-[#22c55e]/12 text-[#4ade80] shadow-[inset_2px_0_0_#22c55e]' 
           : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-[#1a1a2e] hover:text-gray-900 dark:hover:text-gray-200'
         }
       `}
@@ -139,6 +139,7 @@ const Sidebar = ({ isOpen, onClose, onToggle }) => {
       {/* Sidebar */}
       <aside
         className={`
+          dashboard-sidebar
           fixed top-0 left-0 h-full z-50 bg-white dark:bg-[#111118]
           transition-all duration-300 ease-in-out flex-shrink-0 overflow-hidden
           ${isOpen ? 'w-60 translate-x-0 border-r border-gray-200 dark:border-gray-800/50' : 'w-60 -translate-x-full border-r-0'}
@@ -187,9 +188,9 @@ const Sidebar = ({ isOpen, onClose, onToggle }) => {
             {/* Rank Card */}
             <NavLink
               to="/leaderboard"
-              className="flex items-center gap-3 p-2.5 rounded-lg bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20 hover:border-amber-500/40 transition-all"
+              className="flex items-center gap-3 p-2.5 rounded-lg bg-[#22c55e]/[0.06] border border-[#22c55e]/20 hover:border-[#22c55e]/40 transition-all"
             >
-              <Trophy className="w-4 h-4 text-amber-500 flex-shrink-0" />
+              <Trophy className="w-4 h-4 text-[#4ade80] flex-shrink-0" />
               <div className="flex-1 min-w-0">
                 <div className="text-[10px] text-gray-500 dark:text-gray-500 uppercase tracking-wider">Rank</div>
                 <div className="text-sm font-bold text-gray-900 dark:text-white truncate">
@@ -199,7 +200,7 @@ const Sidebar = ({ isOpen, onClose, onToggle }) => {
               {userRank && (
                 <div className="text-right flex-shrink-0">
                   <div className="text-[10px] text-gray-500 dark:text-gray-500">Score</div>
-                  <div className="text-sm font-bold text-amber-500">{userRank.cScore}</div>
+                  <div className="text-sm font-bold text-[#4ade80]">{userRank.cScore}</div>
                 </div>
               )}
             </NavLink>

@@ -14,7 +14,7 @@ const RatingChart = ({
   platformRatingColors
 }) => {
   return (
-    <div className="bg-white dark:bg-[#16161f] rounded-xl p-4 sm:p-6 border border-gray-200 dark:border-gray-800 shadow-sm transition-colors">
+    <div className="dashboard-card p-4 sm:p-5">
       {/* Header with current rating */}
       <div className="flex items-center justify-between mb-2">
         <div>
@@ -37,7 +37,7 @@ const RatingChart = ({
           onClick={() => setSelectedRatingPlatform('all')}
           className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all whitespace-nowrap ${
             selectedRatingPlatform === 'all' 
-              ? 'bg-amber-500 text-black' 
+              ? 'bg-[#22c55e] text-[#06100a]' 
               : 'bg-gray-100 dark:bg-[#1a1a2e] text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-[#252536] border border-gray-300 dark:border-gray-700 transition-colors'
           }`}
         >
@@ -53,7 +53,7 @@ const RatingChart = ({
               disabled={!hasData}
               className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all flex items-center gap-1.5 whitespace-nowrap ${
                 selectedRatingPlatform === platform 
-                  ? 'bg-amber-500 text-black' 
+                  ? 'bg-[#22c55e] text-[#06100a]' 
                   : hasData 
                     ? 'bg-gray-100 dark:bg-[#1a1a2e] text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-[#252536] border border-gray-300 dark:border-gray-700 transition-colors'
                     : 'bg-gray-100 dark:bg-[#1a1a2e] text-gray-400 dark:text-gray-600 cursor-not-allowed opacity-50 transition-colors'

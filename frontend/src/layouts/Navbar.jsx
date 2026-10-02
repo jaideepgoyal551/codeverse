@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Menu, LogOut, Settings, User } from 'lucide-react';
+import { Menu, LogOut, Settings, User, Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import UserAvatar from '../components/UserAvatar';
 import { useTheme } from '../hooks/useCustomHooks';
@@ -26,25 +26,41 @@ const Navbar = React.memo(({ user, onMenuClick, onLogout }) => {
   }, []);
 
   return (
-    <nav className="bg-white dark:bg-[#16161f] border-b border-gray-200 dark:border-gray-800 sticky top-0 z-30 transition-colors">
-      <div className="flex items-center justify-between px-3 sm:px-6 py-3 sm:py-4">
+    <nav className="dashboard-topbar sticky top-0 z-30 transition-colors">
+      <div className="flex min-h-[58px] items-center justify-between gap-4 px-3 py-2.5 sm:px-6">
         {/* Left Section */}
-        <div className="flex items-center gap-4">
+        <div className="flex min-w-0 flex-1 items-center gap-4">
           <button
             onClick={onMenuClick}
-            className="text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-[#1a1a2e] transition-colors"
+            className="rounded-lg p-2 text-gray-400 transition-colors hover:bg-white/5 hover:text-white"
             title="Toggle sidebar"
           >
             <Menu className="w-6 h-6" />
           </button>
+          <div className="dashboard-search hidden max-w-[480px] flex-1 items-center gap-2.5 md:flex">
+            <Search className="h-4 w-4 shrink-0 text-gray-500" />
+            <input
+              type="search"
+              aria-label="Search CodeVerse"
+              placeholder="Search problems, contests, users, or topics..."
+              className="min-w-0 flex-1 bg-transparent text-xs text-gray-200 outline-none placeholder:text-gray-500"
+            />
+            <kbd className="rounded border border-white/10 px-1.5 py-0.5 text-[10px] text-gray-500">Ctrl K</kbd>
+          </div>
         </div>
 
         {/* Right Section */}
         <div className="flex items-center gap-4">
+          <div className="hidden items-center gap-5 lg:flex">
+            <button onClick={() => navigate('/sheets')} className="text-xs text-gray-400 transition hover:text-white">Explore</button>
+            <button onClick={() => navigate('/contests')} className="text-xs text-gray-400 transition hover:text-white">Contests</button>
+            <button onClick={() => navigate('/leaderboard')} className="text-xs text-gray-400 transition hover:text-white">Leaderboard</button>
+            <button onClick={() => navigate('/societies')} className="text-xs text-gray-400 transition hover:text-white">Community</button>
+          </div>
           {/* Theme Toggle */}
           <button
             onClick={toggleTheme}
-            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-[#1a1a2e] text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+            className="rounded-lg p-2 text-gray-400 transition-colors hover:bg-white/5 hover:text-white"
             title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
           >
             {theme === 'dark' ? (
@@ -58,7 +74,7 @@ const Navbar = React.memo(({ user, onMenuClick, onLogout }) => {
           <NotificationBell />
 
           {/* User Menu */}
-          <div className="flex items-center gap-2 sm:gap-3 pl-2 sm:pl-3 border-l border-gray-200 dark:border-gray-700">
+          <div className="flex items-center gap-2 border-l border-white/10 pl-2 sm:gap-3 sm:pl-3">
             <div className="relative" ref={profileRef}>
               <button 
                 onClick={() => setShowProfileMenu(!showProfileMenu)}

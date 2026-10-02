@@ -28,7 +28,7 @@ const DashboardLayout = () => {
   const toggleSidebar = () => setSidebarOpen(prev => !prev);
 
   return (
-    <div className="flex h-screen bg-[#05070d] text-white transition-colors">
+    <div className="dashboard-app flex h-screen bg-[#05070d] text-white transition-colors">
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} onToggle={toggleSidebar} />
 
       <div className="flex-1 flex flex-col overflow-hidden">
@@ -38,7 +38,7 @@ const DashboardLayout = () => {
           onLogout={handleLogout}
         />
 
-        <main className="flex-1 overflow-y-auto custom-scrollbar bg-[#05070d] p-4 md:p-6 xl:p-8 transition-colors">
+        <main className="dashboard-main flex-1 overflow-y-auto custom-scrollbar bg-[#05070d] p-3 sm:p-4 xl:p-5 transition-colors">
           <Outlet />
         </main>
       </div>

@@ -17,7 +17,6 @@ const SplashScreen = ({ onComplete }) => {
   const [dots, setDots] = useState('');
   const startedRef = useRef(false);
 
-  // Animate dots
   useEffect(() => {
     const interval = setInterval(() => {
       setDots(prev => (prev.length >= 3 ? '' : prev + '.'));
@@ -25,7 +24,6 @@ const SplashScreen = ({ onComplete }) => {
     return () => clearInterval(interval);
   }, []);
 
-  // Advance through statuses
   useEffect(() => {
     if (statusIndex >= STATUSES.length - 1) return;
     const timer = setTimeout(() => {
@@ -34,7 +32,6 @@ const SplashScreen = ({ onComplete }) => {
     return () => clearTimeout(timer);
   }, [statusIndex]);
 
-  // Animate progress bar
   useEffect(() => {
     const interval = setInterval(() => {
       setProgress(prev => {
@@ -45,13 +42,11 @@ const SplashScreen = ({ onComplete }) => {
     return () => clearInterval(interval);
   }, []);
 
-  // Ping backend until it responds
   useEffect(() => {
     if (startedRef.current) return;
     startedRef.current = true;
 
     let cancelled = false;
-    let retries = 0;
 
     const ping = async () => {
       while (!cancelled) {
@@ -70,7 +65,7 @@ const SplashScreen = ({ onComplete }) => {
             return;
           }
         } catch {
-          retries++;
+          // keep retrying until the backend is reachable
         }
         if (!cancelled) {
           await new Promise(r => setTimeout(r, 1500));
@@ -91,37 +86,37 @@ const SplashScreen = ({ onComplete }) => {
         fadeOut ? 'opacity-0' : 'opacity-100'
       }`}
       style={{
-        background: 'radial-gradient(ellipse at 50% 40%, rgba(139,92,246,0.12), transparent 70%), radial-gradient(ellipse at 80% 60%, rgba(245,158,11,0.08), transparent 50%), #0B0F1A',
+        background:
+          'radial-gradient(circle at 50% 40%, rgba(126, 92, 255, 0.15), transparent 26%), radial-gradient(circle at 50% 58%, rgba(96, 165, 250, 0.06), transparent 28%), #050b14',
       }}
     >
-      <div className="text-center px-6">
-        {/* Logo */}
-        <div className="mb-8 flex justify-center">
-          <div className="relative">
-            <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-amber-500 to-purple-600 flex items-center justify-center shadow-2xl shadow-amber-500/20 animate-pulse">
-              <span className="text-4xl font-bold text-white">&lt;/&gt;</span>
+      <div className="flex flex-col items-center justify-center text-center px-6">
+        <div className="mb-8 flex items-center justify-center">
+          <div className="relative flex h-[180px] w-[180px] items-center justify-center rounded-[28px] bg-gradient-to-br from-[#f0a14c] via-[#cf89ff] to-[#7f6dff] shadow-[0_0_40px_rgba(173,122,255,0.45)]">
+            <div className="absolute inset-0 rounded-[28px] bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.3),transparent_35%)]" />
+            <div className="relative h-[92px] w-[92px]">
+              <span className="absolute left-0 top-1/2 h-[7px] w-[42px] -translate-y-1/2 rotate-[35deg] rounded-full bg-white/90" />
+              <span className="absolute right-0 top-1/2 h-[7px] w-[42px] -translate-y-1/2 -rotate-[35deg] rounded-full bg-white/90" />
+              <span className="absolute left-1/2 top-1/2 h-[72px] w-[7px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/95" />
             </div>
-            <div className="absolute -inset-2 rounded-2xl bg-gradient-to-br from-amber-500/20 to-purple-600/20 blur-xl -z-10" />
           </div>
         </div>
 
-        {/* Title */}
-        <h1 className="text-4xl font-bold text-white mb-2 tracking-tight">
+        <h1 className="mb-4 text-[5.1rem] font-black leading-[0.9] tracking-[-0.08em] text-white">
           CodeVerse
         </h1>
-        <p className="text-gray-400 mb-10 text-lg">
+
+        <p className="mb-10 text-[2.2rem] font-light text-slate-200">
           Unified Competitive Programming Hub
         </p>
 
-        {/* Status */}
-        <p className="text-amber-400 font-medium mb-4 h-6 transition-all duration-300">
+        <p className="mb-5 text-[2.3rem] font-bold tracking-tight text-[#f6b548]">
           {status.text}{statusIndex < STATUSES.length - 1 ? dots : ''}
         </p>
 
-        {/* Progress bar */}
-        <div className="w-64 mx-auto h-1.5 bg-gray-800 rounded-full overflow-hidden">
+        <div className="h-3 w-[390px] max-w-[80vw] overflow-hidden rounded-full bg-[#1a2340] shadow-inner shadow-black/30">
           <div
-            className="h-full bg-gradient-to-r from-amber-500 to-purple-500 rounded-full transition-all duration-500 ease-out"
+            className="h-full rounded-full bg-gradient-to-r from-[#f6b548] via-[#f59e0b] to-[#a855f7] transition-all duration-500 ease-out"
             style={{ width: `${progress}%` }}
           />
         </div>
