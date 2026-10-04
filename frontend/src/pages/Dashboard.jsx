@@ -1,6 +1,6 @@
 import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import PLATFORM_CONFIG, { PlatformIcon, getPlatformColor } from '../utils/platformConfig';
+import PLATFORM_CONFIG, { PlatformIcon, getPlatformColor, getCodeforcesMaxRank } from '../utils/platformConfig';
 import { 
   Code, 
   MapPin,
@@ -518,27 +518,8 @@ const Dashboard = () => {
 
 // ============== Extracted Dashboard Sub-Components ==============
 
-const getCodeforcesRankLabel = (stats = {}) => {
-  const rank = typeof stats.rank === 'string' ? stats.rank.trim() : '';
-  if (rank && rank.toLowerCase() !== 'unrated') {
-    return rank.replace(/\b\w/g, character => character.toUpperCase());
-  }
-
-  const rating = Number(stats.maxRating || stats.rating) || 0;
-  if (rating < 1200) return null;
-  if (rating < 1400) return 'Pupil';
-  if (rating < 1600) return 'Specialist';
-  if (rating < 1900) return 'Expert';
-  if (rating < 2100) return 'Candidate Master';
-  if (rating < 2300) return 'Master';
-  if (rating < 2400) return 'International Master';
-  if (rating < 2600) return 'Grandmaster';
-  if (rating < 3000) return 'International Grandmaster';
-  return 'Legendary Grandmaster';
-};
-
 const ProfileSection = React.memo(({ displayUser, connectedPlatforms, codeforcesStats, totalProblems, ratingChart, isOwnProfile, navigate, getPlatformUrl }) => {
-  const codeforcesRank = getCodeforcesRankLabel(codeforcesStats);
+  const codeforcesRank = getCodeforcesMaxRank(codeforcesStats);
 
   return (
   <section className="dashboard-profile-card">
@@ -599,7 +580,7 @@ const ProfileSection = React.memo(({ displayUser, connectedPlatforms, codeforces
           : (stats.totalSolved || stats.problemsSolved || 0));
         const rating = Number(stats.rating || stats.currentRating || 0);
         const maxRating = Number(stats.maxRating || rating || 0);
-        const rank = platform.key === 'codeforces' ? getCodeforcesRankLabel(stats) : null;
+        const rank = platform.key === 'codeforces' ? getCodeforcesMaxRank(stats) : null;
         return (
           <a
             key={platform.key}

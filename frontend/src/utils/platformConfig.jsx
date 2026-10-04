@@ -193,4 +193,27 @@ export const getPlatformColor = (platform) => {
   return PLATFORM_CONFIG[platform?.toLowerCase()]?.color || '#888';
 };
 
+export const getCodeforcesMaxRank = (stats = {}) => {
+  const maxRating = Number(stats.maxRating) || 0;
+  if (maxRating > 0) {
+    if (maxRating >= 3000) return 'Legendary Grandmaster';
+    if (maxRating >= 2600) return 'International Grandmaster';
+    if (maxRating >= 2400) return 'Grandmaster';
+    if (maxRating >= 2300) return 'International Master';
+    if (maxRating >= 2100) return 'Master';
+    if (maxRating >= 1900) return 'Candidate Master';
+    if (maxRating >= 1600) return 'Expert';
+    if (maxRating >= 1400) return 'Specialist';
+    if (maxRating >= 1200) return 'Pupil';
+    return 'Newbie';
+  }
+
+  const maxRank = typeof stats.maxRank === 'string' ? stats.maxRank.trim() : '';
+  if (maxRank && maxRank.toLowerCase() !== 'unrated') {
+    return maxRank.replace(/\b\w/g, character => character.toUpperCase());
+  }
+
+  return null;
+};
+
 export default PLATFORM_CONFIG;

@@ -3,7 +3,7 @@ import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
 } from 'recharts';
 import { TrendingUp } from 'lucide-react';
-import PLATFORM_CONFIG, { PlatformIcon } from '../../utils/platformConfig';
+import PLATFORM_CONFIG, { PlatformIcon, getCodeforcesMaxRank } from '../../utils/platformConfig';
 
 const RatingChart = ({
   ratingHistory,
@@ -20,21 +20,7 @@ const RatingChart = ({
   const maxRatingPlatform = selectedRatingPlatform === 'all' ? 'codeforces' : selectedRatingPlatform;
   const selectedStats = platformStats[maxRatingPlatform] || {};
   const maxRating = Number(selectedStats.maxRating || selectedStats.rating || 0);
-  const codeforcesMaxRating = Number(platformStats.codeforces?.maxRating || platformStats.codeforces?.rating || 0);
-  const codeforcesRank = typeof platformStats.codeforces?.maxRank === 'string' && platformStats.codeforces.maxRank
-    ? platformStats.codeforces.maxRank
-    : typeof platformStats.codeforces?.rank === 'string' && platformStats.codeforces.rank !== 'unrated'
-      ? platformStats.codeforces.rank
-      : codeforcesMaxRating >= 3000 ? 'Legendary Grandmaster'
-        : codeforcesMaxRating >= 2600 ? 'International Grandmaster'
-          : codeforcesMaxRating >= 2400 ? 'Grandmaster'
-            : codeforcesMaxRating >= 2300 ? 'International Master'
-              : codeforcesMaxRating >= 2100 ? 'Master'
-                : codeforcesMaxRating >= 1900 ? 'Candidate Master'
-                  : codeforcesMaxRating >= 1600 ? 'Expert'
-                    : codeforcesMaxRating >= 1400 ? 'Specialist'
-                      : codeforcesMaxRating >= 1200 ? 'Pupil'
-                        : null;
+  const codeforcesRank = getCodeforcesMaxRank(platformStats.codeforces);
   const maxRatingTitle = maxRatingPlatform === 'codeforces' ? codeforcesRank : null;
 
   return (
