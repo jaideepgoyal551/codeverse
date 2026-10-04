@@ -479,13 +479,13 @@ const Dashboard = () => {
                 <div className="dashboard-card dashboard-heatmap-card">
                   <ContributionCalendar calendarData={contributionCalendar} connectedPlatforms={connectedPlatforms} />
                 </div>
-                <ProblemsBreakdown platformStats={platformStats} dsaProblems={dsaProblems} cpProblems={cpProblems} PLATFORM_CONFIG={PLATFORM_CONFIG} PlatformIcon={PlatformIcon} />
+                <div className="dashboard-heatmap-side">
+                  <StatsRow activeDays={contributionCalendar?.stats?.activeDays || userData?.totals?.activeDays || 0} />
+                  <ContestsSection totalContests={totalContests} contestsByPlatform={contestsByPlatform} PlatformIcon={PlatformIcon} getPlatformColor={getPlatformColor} />
+                </div>
               </div>
 
-              <div className="dashboard-activity-grid">
-                <StatsRow activeDays={contributionCalendar?.stats?.activeDays || userData?.totals?.activeDays || 0} />
-                <ContestsSection totalContests={totalContests} contestsByPlatform={contestsByPlatform} PlatformIcon={PlatformIcon} getPlatformColor={getPlatformColor} />
-              </div>
+              <ProblemsBreakdown platformStats={platformStats} dsaProblems={dsaProblems} cpProblems={cpProblems} PLATFORM_CONFIG={PLATFORM_CONFIG} PlatformIcon={PlatformIcon} />
 
               <div 
                 onClick={() => navigate('/sheets')}

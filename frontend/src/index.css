@@ -491,9 +491,9 @@ body {
 
 .dashboard-heatmap-row {
   display: grid;
-  grid-template-columns: minmax(0, 1.55fr) minmax(300px, 0.85fr);
+  grid-template-columns: minmax(0, 1.65fr) minmax(250px, 0.7fr);
   align-items: start;
-  gap: 16px;
+  gap: 14px;
 }
 
 .dashboard-heatmap-row > * {
@@ -501,13 +501,44 @@ body {
 }
 
 .dashboard-heatmap-row > .dashboard-card {
-  padding: 18px;
+  padding: 14px;
 }
 
-.dashboard-activity-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(260px, 0.75fr);
-  gap: 14px;
+.dashboard-heatmap-side {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.dashboard-heatmap-side .dashboard-stat-card {
+  min-height: 104px;
+  padding: 12px 14px;
+}
+
+.dashboard-heatmap-side .dashboard-stat-value {
+  font-size: 1.6rem;
+}
+
+.dashboard-heatmap-side .dashboard-contests-card {
+  padding: 13px 14px;
+}
+
+.dashboard-heatmap-side .dashboard-contests-card .mt-2 {
+  margin-top: 4px;
+}
+
+.dashboard-heatmap-side .dashboard-contests-card .mt-4 {
+  margin-top: 10px;
+}
+
+.dashboard-heatmap-side .dashboard-contests-card .h-11 {
+  width: 36px;
+  height: 36px;
+}
+
+.dashboard-heatmap-side .dashboard-contests-card .space-y-2 > :not([hidden]) ~ :not([hidden]) {
+  margin-top: 7px;
 }
 
 .dashboard-bottom-actions {
@@ -639,7 +670,7 @@ body {
   }
 
   .dashboard-heatmap-row {
-    grid-template-columns: minmax(0, 1.3fr) minmax(270px, 0.9fr);
+    grid-template-columns: minmax(0, 1.2fr) minmax(240px, 0.8fr);
   }
 }
 
@@ -673,8 +704,7 @@ body {
     gap: 12px;
   }
 
-  .dashboard-heatmap-row,
-  .dashboard-activity-grid {
+  .dashboard-heatmap-row {
     grid-template-columns: minmax(0, 1fr);
     gap: 12px;
   }
