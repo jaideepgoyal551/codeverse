@@ -454,33 +454,36 @@ const Dashboard = () => {
             displayUser={displayUser}
             connectedPlatforms={connectedPlatforms}
             codeforcesStats={platformStats.codeforces}
+            totalProblems={totalProblems}
+            ratingChart={
+              <Suspense fallback={<div className="dashboard-card dashboard-rating-chart-loading" />}>
+                <RatingChart
+                  compact
+                  ratingHistory={ratingHistory}
+                  allRatingHistory={allRatingHistory}
+                  selectedRatingPlatform={selectedRatingPlatform}
+                  setSelectedRatingPlatform={setSelectedRatingPlatform}
+                  platformStats={platformStats}
+                  platformRatingColors={platformRatingColors}
+                />
+              </Suspense>
+            }
             isOwnProfile={isOwnProfile}
             navigate={navigate}
             getPlatformUrl={getPlatformUrl}
           />
 
-          <div className="dashboard-layout">
+          <div className="dashboard-body">
             <main className="dashboard-primary">
-              <div className="dashboard-primary-grid">
-                <Suspense fallback={<div className="dashboard-card flex h-64 items-center justify-center text-gray-500">Loading chart...</div>}>
-                  <RatingChart 
-                    ratingHistory={ratingHistory}
-                    allRatingHistory={allRatingHistory}
-                    selectedRatingPlatform={selectedRatingPlatform}
-                    setSelectedRatingPlatform={setSelectedRatingPlatform}
-                    platformStats={platformStats}
-                    platformRatingColors={platformRatingColors}
-                  />
-                </Suspense>
+              <div className="dashboard-heatmap-row">
+                <div className="dashboard-card dashboard-heatmap-card">
+                  <ContributionCalendar calendarData={contributionCalendar} connectedPlatforms={connectedPlatforms} />
+                </div>
                 <ProblemsBreakdown platformStats={platformStats} dsaProblems={dsaProblems} cpProblems={cpProblems} PLATFORM_CONFIG={PLATFORM_CONFIG} PlatformIcon={PlatformIcon} />
               </div>
 
-              <div className="dashboard-card dashboard-heatmap-card">
-                <ContributionCalendar calendarData={contributionCalendar} connectedPlatforms={connectedPlatforms} />
-              </div>
-
               <div className="dashboard-activity-grid">
-                <StatsRow totalProblems={totalProblems} activeDays={contributionCalendar?.stats?.activeDays || userData?.totals?.activeDays || 0} />
+                <StatsRow activeDays={contributionCalendar?.stats?.activeDays || userData?.totals?.activeDays || 0} />
                 <ContestsSection totalContests={totalContests} contestsByPlatform={contestsByPlatform} PlatformIcon={PlatformIcon} getPlatformColor={getPlatformColor} />
               </div>
 
@@ -503,7 +506,7 @@ const Dashboard = () => {
               <TopicAnalysisSection topicAnalysis={topicAnalysis} navigate={navigate} PLATFORM_CONFIG={PLATFORM_CONFIG} PlatformIcon={PlatformIcon} />
             </main>
 
-            <aside className="dashboard-aside">
+            <aside className="dashboard-bottom-actions">
               <SyncButtonSection isOwnProfile={isOwnProfile} syncing={syncing} cooldownRemaining={cooldownRemaining} handleSync={handleSync} formatCooldown={formatCooldown} SYNC_COOLDOWN_MS={SYNC_COOLDOWN_MS} getSyncKey={getSyncKey} />
               <QuickLinksSection navigate={navigate} />
             </aside>
@@ -521,7 +524,7 @@ const getCodeforcesRankLabel = (stats = {}) => {
     return rank.replace(/\b\w/g, character => character.toUpperCase());
   }
 
-  const rating = Number(stats.rating) || 0;
+  const rating = Number(stats.maxRating || stats.rating) || 0;
   if (rating < 1200) return null;
   if (rating < 1400) return 'Pupil';
   if (rating < 1600) return 'Specialist';
@@ -534,48 +537,57 @@ const getCodeforcesRankLabel = (stats = {}) => {
   return 'Legendary Grandmaster';
 };
 
-const ProfileSection = React.memo(({ displayUser, connectedPlatforms, codeforcesStats, isOwnProfile, navigate, getPlatformUrl }) => {
+const ProfileSection = React.memo(({ displayUser, connectedPlatforms, codeforcesStats, totalProblems, ratingChart, isOwnProfile, navigate, getPlatformUrl }) => {
   const codeforcesRank = getCodeforcesRankLabel(codeforcesStats);
 
   return (
   <section className="dashboard-profile-card">
     <div className="dashboard-profile-top">
-      <div className="flex min-w-0 items-center gap-4">
-        <div className="dashboard-avatar">
-          {displayUser?.avatar ? (
-            <img src={displayUser.avatar} alt="" className="h-full w-full object-cover" />
-          ) : (
-            <span>{displayUser?.fullName?.[0] || displayUser?.username?.[0] || 'U'}</span>
-          )}
-        </div>
-        <div className="min-w-0">
-          <div className="flex flex-wrap items-center gap-2">
-            <h2 className="truncate text-xl font-bold text-white">{displayUser?.fullName || 'Coder'}</h2>
-            <span className="text-amber-300" aria-label="Verified profile">★</span>
-            <span className="text-sm" aria-label="Active">🟢</span>
-            {codeforcesRank && (
-              <span className="dashboard-rank-badge" title="Codeforces rank">
-                Codeforces · {codeforcesRank}
-              </span>
+      <div className="dashboard-profile-summary">
+        <div className="flex min-w-0 items-center gap-4">
+          <div className="dashboard-avatar">
+            {displayUser?.avatar ? (
+              <img src={displayUser.avatar} alt="" className="h-full w-full object-cover" />
+            ) : (
+              <span>{displayUser?.fullName?.[0] || displayUser?.username?.[0] || 'U'}</span>
             )}
           </div>
-          <p className="mt-1 text-sm text-gray-400">@{displayUser?.username || 'coder'}</p>
-          <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-gray-400">
-            {displayUser?.location && <span className="flex items-center gap-1.5"><MapPin className="h-3.5 w-3.5" />{displayUser.location}</span>}
-            {displayUser?.institution && <span className="flex items-center gap-1.5"><Building className="h-3.5 w-3.5" />{displayUser.institution}</span>}
-            <span className="flex items-center gap-1.5"><Code className="h-3.5 w-3.5 text-[#4ade80]" />Competitive programmer</span>
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <h2 className="truncate text-xl font-bold text-white">{displayUser?.fullName || 'Coder'}</h2>
+              <span className="dashboard-profile-total" title="Total questions solved across connected platforms">
+                <strong>{Number(totalProblems).toLocaleString()}</strong>
+                <span>solved</span>
+              </span>
+              <span className="text-amber-300" aria-label="Verified profile">★</span>
+              <span className="text-sm" aria-label="Active">🟢</span>
+              {codeforcesRank && (
+                <span className="dashboard-rank-badge" title="Codeforces rank">
+                  Codeforces · {codeforcesRank}
+                </span>
+              )}
+            </div>
+            <p className="mt-1 text-sm text-gray-400">@{displayUser?.username || 'coder'}</p>
+            <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-gray-400">
+              {displayUser?.location && <span className="flex items-center gap-1.5"><MapPin className="h-3.5 w-3.5" />{displayUser.location}</span>}
+              {displayUser?.institution && <span className="flex items-center gap-1.5"><Building className="h-3.5 w-3.5" />{displayUser.institution}</span>}
+              <span className="flex items-center gap-1.5"><Code className="h-3.5 w-3.5 text-[#FFA116]" />Competitive programmer</span>
+            </div>
           </div>
         </div>
+        <div className="dashboard-profile-summary-footer">
+          <div className="dashboard-quote">
+            <span className="dashboard-quote-mark">“</span>
+            <p>{displayUser?.bio || 'A little progress each day adds up to big results.'}</p>
+          </div>
+          {isOwnProfile && (
+            <button onClick={() => navigate('/settings')} className="dashboard-outline-button">
+              Edit Profile
+            </button>
+          )}
+        </div>
       </div>
-      {isOwnProfile && (
-        <button onClick={() => navigate('/settings')} className="dashboard-outline-button">
-          Edit Profile
-        </button>
-      )}
-      <div className="dashboard-quote">
-        <span className="dashboard-quote-mark">“</span>
-        <p>{displayUser?.bio || 'A little progress each day adds up to big results.'}</p>
-      </div>
+      <div className="dashboard-profile-rating-chart">{ratingChart}</div>
     </div>
 
     <div className="dashboard-platforms">
@@ -587,6 +599,7 @@ const ProfileSection = React.memo(({ displayUser, connectedPlatforms, codeforces
           : (stats.totalSolved || stats.problemsSolved || 0));
         const rating = Number(stats.rating || stats.currentRating || 0);
         const maxRating = Number(stats.maxRating || rating || 0);
+        const rank = platform.key === 'codeforces' ? getCodeforcesRankLabel(stats) : null;
         return (
           <a
             key={platform.key}
@@ -614,6 +627,7 @@ const ProfileSection = React.memo(({ displayUser, connectedPlatforms, codeforces
                 <div>
                   <span>Max rating</span>
                   <strong>{maxRating.toLocaleString()}</strong>
+                  {rank && <span className="dashboard-platform-rank">{rank}</span>}
                 </div>
               </div>
             )}
@@ -633,13 +647,8 @@ const ProfileSection = React.memo(({ displayUser, connectedPlatforms, codeforces
   );
 });
 
-const StatsRow = React.memo(({ totalProblems, activeDays }) => (
-  <div className="grid grid-cols-2 gap-3 sm:gap-4">
-    <div className="dashboard-card dashboard-stat-card">
-      <p className="text-gray-600 dark:text-gray-400 text-sm mb-1">Total Questions</p>
-      <p className="dashboard-stat-value">{Number(totalProblems).toLocaleString()}</p>
-      <span className="dashboard-stat-note"><span className="dashboard-live-dot" /> Across connected platforms</span>
-    </div>
+const StatsRow = React.memo(({ activeDays }) => (
+  <div className="grid grid-cols-1 gap-3 sm:gap-4">
     <div className="dashboard-card dashboard-stat-card">
       <p className="text-gray-600 dark:text-gray-400 text-sm mb-1">Total Active Days</p>
       <p className="dashboard-stat-value">{Number(activeDays).toLocaleString()}</p>

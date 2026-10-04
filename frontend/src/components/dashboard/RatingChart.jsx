@@ -11,37 +11,41 @@ const RatingChart = ({
   selectedRatingPlatform,
   setSelectedRatingPlatform,
   platformStats,
-  platformRatingColors
+  platformRatingColors,
+  compact = false
 }) => {
+  const currentRating = selectedRatingPlatform === 'all'
+    ? (platformStats.leetcode?.rating || platformStats.codeforces?.rating || platformStats.codechef?.rating || 0)
+    : (platformStats[selectedRatingPlatform]?.rating || 0);
+
   return (
-    <div className="dashboard-card p-4 sm:p-5">
+    <div className={`dashboard-card p-4 sm:p-5${compact ? ' dashboard-rating-chart-compact' : ''}`}>
       {/* Header with current rating */}
       <div className="flex items-center justify-between mb-2">
         <div>
-          <p className="text-sm text-gray-600 dark:text-gray-400">Rating</p>
-          <p className="text-xl sm:text-3xl font-bold text-gray-900 dark:text-white">
-            {selectedRatingPlatform === 'all' 
-              ? (platformStats.leetcode?.rating || platformStats.codeforces?.rating || platformStats.codechef?.rating || 0)
-              : (platformStats[selectedRatingPlatform]?.rating || 0)}
+          <p className="text-sm text-gray-600 dark:text-gray-400">{compact ? 'Rating history' : 'Rating'}</p>
+          <p className={compact ? 'text-xl font-bold text-gray-900 dark:text-white' : 'text-xl sm:text-3xl font-bold text-gray-900 dark:text-white'}>
+            {Number(currentRating).toLocaleString()}
           </p>
         </div>
-        <div className="text-right text-sm text-gray-400">
+        {!compact && <div className="text-right text-sm text-gray-400">
           <p>{new Date().toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
           <p className="text-xs">Latest Update</p>
-        </div>
+        </div>}
       </div>
 
       {/* Platform Toggle Tabs */}
-      <div className="flex items-center gap-2 mb-4 overflow-x-auto pb-2">
+      <div className={`dashboard-rating-tabs flex items-center gap-2 mb-4 overflow-x-auto pb-2${compact ? ' is-compact' : ''}`}>
         <button
           onClick={() => setSelectedRatingPlatform('all')}
+          title="All platforms"
           className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all whitespace-nowrap ${
             selectedRatingPlatform === 'all' 
               ? 'bg-[#22c55e] text-[#06100a]' 
               : 'bg-gray-100 dark:bg-[#1a1a2e] text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-[#252536] border border-gray-300 dark:border-gray-700 transition-colors'
           }`}
         >
-          All Platforms
+          {compact ? 'All' : 'All Platforms'}
         </button>
         {['leetcode', 'codeforces', 'codechef'].map(platform => {
           const hasData = allRatingHistory.byPlatform?.[platform]?.length > 0;
@@ -50,6 +54,7 @@ const RatingChart = ({
             <button
               key={platform}
               onClick={() => setSelectedRatingPlatform(platform)}
+              title={platformName}
               disabled={!hasData}
               className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all flex items-center gap-1.5 whitespace-nowrap ${
                 selectedRatingPlatform === platform 
@@ -60,14 +65,14 @@ const RatingChart = ({
               }`}
               style={selectedRatingPlatform === platform ? { backgroundColor: platformRatingColors[platform] } : {}}
             >
-              <PlatformIcon platform={platform} className="w-4 h-4" /> {platformName}
+              <PlatformIcon platform={platform} className="w-4 h-4" /> {compact ? platformName.slice(0, 2).toUpperCase() : platformName}
             </button>
           );
         })}
       </div>
 
       {/* Legend for All Platforms view */}
-      {selectedRatingPlatform === 'all' && allRatingHistory.platforms?.length > 0 && (
+      {!compact && selectedRatingPlatform === 'all' && allRatingHistory.platforms?.length > 0 && (
         <div className="flex flex-wrap gap-4 mb-3">
           {allRatingHistory.platforms.map(platform => (
             <div key={platform} className="flex items-center gap-2">
@@ -79,10 +84,13 @@ const RatingChart = ({
       )}
 
       {/* Chart */}
-      <div className="h-52">
+      <div className={compact ? 'h-[88px]' : 'h-52'}>
         {(allRatingHistory.chartData?.length || ratingHistory.length) ? (
           <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
-          <AreaChart data={allRatingHistory.chartData?.length ? allRatingHistory.chartData : ratingHistory}>
+          <AreaChart
+            data={allRatingHistory.chartData?.length ? allRatingHistory.chartData : ratingHistory}
+            margin={compact ? { top: 4, right: 4, left: -28, bottom: -16 } : undefined}
+          >
             <defs>
               <linearGradient id="gradientLeetcode" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="#FFA116" stopOpacity={0.4}/>
@@ -101,8 +109,8 @@ const RatingChart = ({
                 <stop offset="95%" stopColor="#f59e0b" stopOpacity={0}/>
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="currentColor" className="text-gray-200 dark:text-[#2a2a3e]" vertical={false} />
-            <XAxis 
+            {!compact && <CartesianGrid strokeDasharray="3 3" stroke="currentColor" className="text-gray-200 dark:text-[#2a2a3e]" vertical={false} />}
+            {!compact && <XAxis
               dataKey="date" 
               stroke="#666" 
               tick={{ fontSize: 10 }} 
@@ -110,8 +118,8 @@ const RatingChart = ({
                 const date = new Date(value);
                 return date.toLocaleDateString('en-US', { month: 'short', year: '2-digit' });
               }}
-            />
-            <YAxis stroke="#666" tick={{ fontSize: 10 }} domain={['dataMin - 100', 'dataMax + 100']} />
+            />}
+            <YAxis hide={compact} width={compact ? 0 : 60} stroke="#666" tick={{ fontSize: 10 }} domain={['dataMin - 100', 'dataMax + 100']} />
             <Tooltip
               contentStyle={{ 
                 backgroundColor: document.documentElement.classList.contains('dark') ? '#1a1a2e' : '#ffffff', 
@@ -181,7 +189,7 @@ const RatingChart = ({
       </div>
       
       {/* Current Ratings Summary */}
-      <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-8 mt-4 pt-4 border-t border-gray-200 dark:border-gray-800">
+      {!compact && <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-8 mt-4 pt-4 border-t border-gray-200 dark:border-gray-800">
         {selectedRatingPlatform === 'all' ? (
           <>
             {platformStats.leetcode?.rating > 0 && (
@@ -218,7 +226,7 @@ const RatingChart = ({
             );
           })()
         )}
-      </div>
+      </div>}
     </div>
   );
 };
