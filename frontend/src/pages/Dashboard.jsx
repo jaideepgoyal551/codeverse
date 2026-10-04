@@ -450,15 +450,39 @@ const Dashboard = () => {
   return (
     <div className="dashboard-page min-h-full text-gray-900 dark:text-white transition-colors">
       <div className="dashboard-content">
-          <ProfileSection
-            displayUser={displayUser}
-            connectedPlatforms={connectedPlatforms}
-            codeforcesStats={platformStats.codeforces}
-            totalProblems={totalProblems}
-            ratingChart={
-              <Suspense fallback={<div className="dashboard-card dashboard-rating-chart-loading" />}>
+          <div className="dashboard-shell">
+            <aside className="dashboard-profile-column">
+              <ProfileSection
+                displayUser={displayUser}
+                connectedPlatforms={connectedPlatforms}
+                codeforcesStats={platformStats.codeforces}
+                totalProblems={totalProblems}
+                isOwnProfile={isOwnProfile}
+                navigate={navigate}
+                getPlatformUrl={getPlatformUrl}
+              />
+              <SyncButtonSection isOwnProfile={isOwnProfile} syncing={syncing} cooldownRemaining={cooldownRemaining} handleSync={handleSync} formatCooldown={formatCooldown} SYNC_COOLDOWN_MS={SYNC_COOLDOWN_MS} getSyncKey={getSyncKey} />
+              <QuickLinksSection navigate={navigate} />
+            </aside>
+
+            <main className="dashboard-main-column">
+              <div className="dashboard-overview">
+                <StatsRow
+                  totalProblems={totalProblems}
+                  activeDays={contributionCalendar?.stats?.activeDays || userData?.totals?.activeDays || 0}
+                />
+                <div className="dashboard-card dashboard-heatmap-card">
+                  <ContributionCalendar calendarData={contributionCalendar} connectedPlatforms={connectedPlatforms} />
+                </div>
+              </div>
+
+              <div className="dashboard-secondary-grid">
+                <ContestsSection totalContests={totalContests} contestsByPlatform={contestsByPlatform} PlatformIcon={PlatformIcon} getPlatformColor={getPlatformColor} />
+                <ProblemsBreakdown platformStats={platformStats} dsaProblems={dsaProblems} cpProblems={cpProblems} PLATFORM_CONFIG={PLATFORM_CONFIG} PlatformIcon={PlatformIcon} />
+              </div>
+
+              <Suspense fallback={<div className="dashboard-card flex h-64 items-center justify-center text-gray-500">Loading chart...</div>}>
                 <RatingChart
-                  compact
                   ratingHistory={ratingHistory}
                   allRatingHistory={allRatingHistory}
                   selectedRatingPlatform={selectedRatingPlatform}
@@ -467,25 +491,6 @@ const Dashboard = () => {
                   platformRatingColors={platformRatingColors}
                 />
               </Suspense>
-            }
-            isOwnProfile={isOwnProfile}
-            navigate={navigate}
-            getPlatformUrl={getPlatformUrl}
-          />
-
-          <div className="dashboard-body">
-            <main className="dashboard-primary">
-              <div className="dashboard-heatmap-row">
-                <div className="dashboard-card dashboard-heatmap-card">
-                  <ContributionCalendar calendarData={contributionCalendar} connectedPlatforms={connectedPlatforms} />
-                </div>
-                <div className="dashboard-heatmap-side">
-                  <StatsRow activeDays={contributionCalendar?.stats?.activeDays || userData?.totals?.activeDays || 0} />
-                  <ContestsSection totalContests={totalContests} contestsByPlatform={contestsByPlatform} PlatformIcon={PlatformIcon} getPlatformColor={getPlatformColor} />
-                </div>
-              </div>
-
-              <ProblemsBreakdown platformStats={platformStats} dsaProblems={dsaProblems} cpProblems={cpProblems} PLATFORM_CONFIG={PLATFORM_CONFIG} PlatformIcon={PlatformIcon} />
 
               <div 
                 onClick={() => navigate('/sheets')}
@@ -505,11 +510,6 @@ const Dashboard = () => {
 
               <TopicAnalysisSection topicAnalysis={topicAnalysis} navigate={navigate} PLATFORM_CONFIG={PLATFORM_CONFIG} PlatformIcon={PlatformIcon} />
             </main>
-
-            <aside className="dashboard-bottom-actions">
-              <SyncButtonSection isOwnProfile={isOwnProfile} syncing={syncing} cooldownRemaining={cooldownRemaining} handleSync={handleSync} formatCooldown={formatCooldown} SYNC_COOLDOWN_MS={SYNC_COOLDOWN_MS} getSyncKey={getSyncKey} />
-              <QuickLinksSection navigate={navigate} />
-            </aside>
           </div>
       </div>
     </div>
@@ -518,120 +518,109 @@ const Dashboard = () => {
 
 // ============== Extracted Dashboard Sub-Components ==============
 
-const ProfileSection = React.memo(({ displayUser, connectedPlatforms, codeforcesStats, totalProblems, ratingChart, isOwnProfile, navigate, getPlatformUrl }) => {
+const ProfileSection = React.memo(({ displayUser, connectedPlatforms, codeforcesStats, totalProblems, isOwnProfile, navigate, getPlatformUrl }) => {
   const codeforcesRank = getCodeforcesMaxRank(codeforcesStats);
 
   return (
-  <section className="dashboard-profile-card">
-    <div className="dashboard-profile-top">
-      <div className="dashboard-profile-summary">
-        <div className="flex min-w-0 items-center gap-4">
-          <div className="dashboard-avatar">
-            {displayUser?.avatar ? (
-              <img src={displayUser.avatar} alt="" className="h-full w-full object-cover" />
-            ) : (
-              <span>{displayUser?.fullName?.[0] || displayUser?.username?.[0] || 'U'}</span>
-            )}
-          </div>
-          <div className="min-w-0">
-            <div className="flex flex-wrap items-center gap-2">
-              <h2 className="truncate text-xl font-bold text-white">{displayUser?.fullName || 'Coder'}</h2>
-              <span className="dashboard-profile-total" title="Total questions solved across connected platforms">
-                <strong>{Number(totalProblems).toLocaleString()}</strong>
-                <span>solved</span>
-              </span>
-              <span className="text-amber-300" aria-label="Verified profile">★</span>
-              <span className="text-sm" aria-label="Active">🟢</span>
-              {codeforcesRank && (
-                <span className="dashboard-rank-badge" title="Codeforces rank">
-                  Codeforces · {codeforcesRank}
-                </span>
-              )}
-            </div>
-            <p className="mt-1 text-sm text-gray-400">@{displayUser?.username || 'coder'}</p>
-            <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-gray-400">
-              {displayUser?.location && <span className="flex items-center gap-1.5"><MapPin className="h-3.5 w-3.5" />{displayUser.location}</span>}
-              {displayUser?.institution && <span className="flex items-center gap-1.5"><Building className="h-3.5 w-3.5" />{displayUser.institution}</span>}
-              <span className="flex items-center gap-1.5"><Code className="h-3.5 w-3.5 text-[#FFA116]" />Competitive programmer</span>
-            </div>
-          </div>
-        </div>
-        <div className="dashboard-profile-summary-footer">
-          <div className="dashboard-quote">
-            <span className="dashboard-quote-mark">“</span>
-            <p>{displayUser?.bio || 'A little progress each day adds up to big results.'}</p>
-          </div>
-          {isOwnProfile && (
-            <button onClick={() => navigate('/settings')} className="dashboard-outline-button">
-              Edit Profile
-            </button>
+    <section className="dashboard-profile-card">
+      <div className="dashboard-profile-sidebar-summary">
+        <div className="dashboard-avatar">
+          {displayUser?.avatar ? (
+            <img src={displayUser.avatar} alt="" className="h-full w-full object-cover" />
+          ) : (
+            <span>{displayUser?.fullName?.[0] || displayUser?.username?.[0] || 'U'}</span>
           )}
         </div>
+        <div className="dashboard-profile-name">
+          <h2>{displayUser?.fullName || 'Coder'}</h2>
+          <p>@{displayUser?.username || 'coder'}</p>
+          <span className="dashboard-profile-total" title="Total questions solved across connected platforms">
+            <strong>{Number(totalProblems).toLocaleString()}</strong>
+            <span>questions solved</span>
+          </span>
+        </div>
+        {codeforcesRank && (
+          <span className="dashboard-rank-badge" title="Codeforces highest rank">
+            Codeforces · {codeforcesRank}
+          </span>
+        )}
+        <div className="dashboard-profile-meta">
+          {displayUser?.location && <span><MapPin className="h-3.5 w-3.5" />{displayUser.location}</span>}
+          {displayUser?.institution && <span><Building className="h-3.5 w-3.5" />{displayUser.institution}</span>}
+        </div>
+        {displayUser?.bio && <p className="dashboard-profile-bio">{displayUser.bio}</p>}
+        {isOwnProfile && (
+          <button onClick={() => navigate('/settings')} className="dashboard-outline-button">
+            Edit Profile
+          </button>
+        )}
       </div>
-      <div className="dashboard-profile-rating-chart">{ratingChart}</div>
-    </div>
 
-    <div className="dashboard-platforms">
-      {connectedPlatforms.length > 0 ? connectedPlatforms.map(platform => {
-        const stats = platform.stats || {};
-        const isGithub = platform.key === 'github';
-        const count = Number(isGithub
-          ? (stats.totalContributions || stats.allTimeContributions || stats.contributions || 0)
-          : (stats.totalSolved || stats.problemsSolved || 0));
-        const rating = Number(stats.rating || stats.currentRating || 0);
-        const maxRating = Number(stats.maxRating || rating || 0);
-        const rank = platform.key === 'codeforces' ? getCodeforcesMaxRank(stats) : null;
-        return (
-          <a
-            key={platform.key}
-            href={getPlatformUrl(platform.key, platform.username)}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="dashboard-platform-card"
-          >
-            <div className="dashboard-platform-card-heading">
+      <div className="dashboard-sidebar-platforms">
+        <div className="dashboard-sidebar-section-heading">
+          <h3>Connected platforms</h3>
+          <span>{connectedPlatforms.length}</span>
+        </div>
+        {connectedPlatforms.length > 0 ? connectedPlatforms.map(platform => {
+          const stats = platform.stats || {};
+          const isGithub = platform.key === 'github';
+          const count = Number(isGithub
+            ? (stats.totalContributions || stats.allTimeContributions || stats.contributions || 0)
+            : (stats.totalSolved || stats.problemsSolved || 0));
+          const rating = Number(stats.rating || stats.currentRating || 0);
+          const maxRating = Number(stats.maxRating || rating || 0);
+          const rank = platform.key === 'codeforces' ? getCodeforcesMaxRank(stats) : null;
+          return (
+            <a
+              key={platform.key}
+              href={getPlatformUrl(platform.key, platform.username)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="dashboard-sidebar-platform"
+            >
               <div className="dashboard-platform-icon">
-                <PlatformIcon platform={platform.key} className="h-6 w-6" color={platform.color} />
+                <PlatformIcon platform={platform.key} className="h-5 w-5" color={platform.color} />
               </div>
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium text-gray-200">{platform.name}</p>
-                <p className="truncate text-[11px] text-gray-500">@{platform.username}</p>
-              </div>
-              <ChevronRight className="h-4 w-4 shrink-0 text-gray-500" />
-            </div>
-            {rating > 0 && (
-              <div className="dashboard-platform-rating">
-                <div>
-                  <span>Rating</span>
-                  <strong>{rating.toLocaleString()}</strong>
+              <div className="dashboard-sidebar-platform-info">
+                <div className="dashboard-sidebar-platform-name">
+                  <span>{platform.name}</span>
+                  <ChevronRight className="h-3.5 w-3.5" />
                 </div>
-                <div>
-                  <span>Max rating</span>
-                  <strong>{maxRating.toLocaleString()}</strong>
-                  {rank && <span className="dashboard-platform-rank">{rank}</span>}
-                </div>
+                <span className="dashboard-sidebar-platform-username">@{platform.username}</span>
+                {rating > 0 ? (
+                  <div className="dashboard-sidebar-platform-rating">
+                    <span>Rating <strong>{rating.toLocaleString()}</strong></span>
+                    <span>Max <strong>{maxRating.toLocaleString()}</strong></span>
+                  </div>
+                ) : (
+                  <span className="dashboard-sidebar-platform-solved">
+                    {count.toLocaleString()} {isGithub ? 'contributions' : 'solved'}
+                  </span>
+                )}
+                {rank && <span className="dashboard-platform-rank">{rank}</span>}
               </div>
-            )}
-            <div className="dashboard-platform-solved">
-              <strong>{count.toLocaleString()}</strong>
-              <span>{isGithub ? 'Contributions' : 'Questions solved'}</span>
-            </div>
-          </a>
-        );
-      }) : (
-        <button onClick={() => navigate('/settings')} className="dashboard-add-platform">
-          + Connect your first coding platform
-        </button>
-      )}
-    </div>
-  </section>
+              {rating > 0 && <span className="dashboard-sidebar-platform-count">{count.toLocaleString()}</span>}
+            </a>
+          );
+        }) : (
+          <button onClick={() => navigate('/settings')} className="dashboard-add-platform">
+            + Connect your first coding platform
+          </button>
+        )}
+      </div>
+    </section>
   );
 });
 
-const StatsRow = React.memo(({ activeDays }) => (
-  <div className="grid grid-cols-1 gap-3 sm:gap-4">
+const StatsRow = React.memo(({ totalProblems, activeDays }) => (
+  <div className="dashboard-summary-stats">
+    <div className="dashboard-card dashboard-stat-card dashboard-stat-card-primary">
+      <p className="text-gray-600 dark:text-gray-400 text-sm mb-1">Questions Solved</p>
+      <p className="dashboard-stat-value">{Number(totalProblems).toLocaleString()}</p>
+      <span className="dashboard-stat-note"><span className="dashboard-live-dot" /> Across connected platforms</span>
+    </div>
     <div className="dashboard-card dashboard-stat-card">
-      <p className="text-gray-600 dark:text-gray-400 text-sm mb-1">Total Active Days</p>
+      <p className="text-gray-600 dark:text-gray-400 text-sm mb-1">Active Days</p>
       <p className="dashboard-stat-value">{Number(activeDays).toLocaleString()}</p>
       <span className="dashboard-stat-note"><span className="dashboard-live-dot" /> Keep your streak alive</span>
     </div>
