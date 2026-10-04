@@ -284,6 +284,27 @@ body {
   box-shadow: none;
 }
 
+.dashboard-rating-peak {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 3px;
+  color: #a1a1a7;
+  font-size: 0.67rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.dashboard-rating-peak strong {
+  border: 1px solid rgba(74, 222, 128, 0.3);
+  border-radius: 999px;
+  padding: 2px 7px;
+  background: rgba(34, 197, 94, 0.1);
+  color: #86efac;
+  font-size: 0.62rem;
+  font-weight: 650;
+}
+
 .dashboard-rating-chart-loading {
   min-height: 134px;
 }
@@ -618,6 +639,22 @@ body {
 
 .dashboard-heatmap-card > div {
   overflow: hidden;
+}
+
+.dashboard-heatmap-summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px 22px;
+  margin-bottom: 14px;
+}
+
+.dashboard-heatmap-stats {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 16px;
 }
 
 .dashboard-promo-card {

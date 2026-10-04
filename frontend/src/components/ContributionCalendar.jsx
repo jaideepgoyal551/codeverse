@@ -39,12 +39,17 @@ const ContributionCalendar = ({ calendarData, connectedPlatforms = [] }) => {
       if (!containerRef.current) return;
       const w = containerRef.current.offsetWidth;
       const n = weeks.length || 53;
-      const sz = Math.floor((w - (n - 1) * GAP) / n);
-      setCellPx(Math.max(7, Math.min(15, sz)));
+      const sz = (w - (n - 1) * GAP) / n;
+      setCellPx(Math.max(7, sz));
     };
     calc();
+    const observer = new ResizeObserver(calc);
+    if (containerRef.current) observer.observe(containerRef.current);
     window.addEventListener('resize', calc);
-    return () => window.removeEventListener('resize', calc);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('resize', calc);
+    };
   }, [weeks.length, hasData]);
 
   // ── Theme-aware color palette ──
@@ -117,14 +122,14 @@ const ContributionCalendar = ({ calendarData, connectedPlatforms = [] }) => {
   return (
     <div ref={containerRef} style={{ width: '100%' }}>
       {/* ── Header stats ── */}
-      <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14, gap: 6 }}>
+      <div className="dashboard-heatmap-summary">
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
           <span className="text-xl font-bold text-gray-900 dark:text-white">
             {(stats.totalContributions || 0).toLocaleString()}
           </span>
           <span className="text-sm text-gray-600 dark:text-gray-400">submissions + contributions in the past one year</span>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 18, flexWrap: 'wrap' }} className="text-sm text-gray-600 dark:text-gray-400">
+        <div className="dashboard-heatmap-stats text-sm text-gray-600 dark:text-gray-400">
           <span>Total active days: <b className="text-gray-900 dark:text-white">{stats.activeDays || 0}</b></span>
           <span>Max streak: <b className="text-gray-900 dark:text-white">{stats.longestStreak || 0}</b></span>
           <span>Current streak: <b className="text-gray-900 dark:text-white">{stats.currentStreak || 0}</b></span>

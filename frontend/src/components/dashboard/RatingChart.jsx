@@ -17,6 +17,25 @@ const RatingChart = ({
   const currentRating = selectedRatingPlatform === 'all'
     ? (platformStats.leetcode?.rating || platformStats.codeforces?.rating || platformStats.codechef?.rating || 0)
     : (platformStats[selectedRatingPlatform]?.rating || 0);
+  const maxRatingPlatform = selectedRatingPlatform === 'all' ? 'codeforces' : selectedRatingPlatform;
+  const selectedStats = platformStats[maxRatingPlatform] || {};
+  const maxRating = Number(selectedStats.maxRating || selectedStats.rating || 0);
+  const codeforcesMaxRating = Number(platformStats.codeforces?.maxRating || platformStats.codeforces?.rating || 0);
+  const codeforcesRank = typeof platformStats.codeforces?.maxRank === 'string' && platformStats.codeforces.maxRank
+    ? platformStats.codeforces.maxRank
+    : typeof platformStats.codeforces?.rank === 'string' && platformStats.codeforces.rank !== 'unrated'
+      ? platformStats.codeforces.rank
+      : codeforcesMaxRating >= 3000 ? 'Legendary Grandmaster'
+        : codeforcesMaxRating >= 2600 ? 'International Grandmaster'
+          : codeforcesMaxRating >= 2400 ? 'Grandmaster'
+            : codeforcesMaxRating >= 2300 ? 'International Master'
+              : codeforcesMaxRating >= 2100 ? 'Master'
+                : codeforcesMaxRating >= 1900 ? 'Candidate Master'
+                  : codeforcesMaxRating >= 1600 ? 'Expert'
+                    : codeforcesMaxRating >= 1400 ? 'Specialist'
+                      : codeforcesMaxRating >= 1200 ? 'Pupil'
+                        : null;
+  const maxRatingTitle = maxRatingPlatform === 'codeforces' ? codeforcesRank : null;
 
   return (
     <div className={`dashboard-card p-4 sm:p-5${compact ? ' dashboard-rating-chart-compact' : ''}`}>
@@ -27,6 +46,12 @@ const RatingChart = ({
           <p className={compact ? 'text-xl font-bold text-gray-900 dark:text-white' : 'text-xl sm:text-3xl font-bold text-gray-900 dark:text-white'}>
             {Number(currentRating).toLocaleString()}
           </p>
+          {compact && maxRating > 0 && (
+            <div className="dashboard-rating-peak">
+              <span>Max {maxRating.toLocaleString()}</span>
+              {maxRatingTitle && <strong>{maxRatingTitle}</strong>}
+            </div>
+          )}
         </div>
         {!compact && <div className="text-right text-sm text-gray-400">
           <p>{new Date().toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
