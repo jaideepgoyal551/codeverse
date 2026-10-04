@@ -24,6 +24,8 @@ const platformStatsSchema = new mongoose.Schema({
     // Competitive Programming (Codeforces, CodeChef)
     rating: { type: Number, default: 0 },
     maxRating: { type: Number, default: 0 },
+    rank: { type: String, default: '' },
+    maxRank: { type: String, default: '' },
     contestsParticipated: { type: Number, default: 0 },
     globalRank: { type: Number, default: 0 },
     countryRank: { type: Number, default: 0 },

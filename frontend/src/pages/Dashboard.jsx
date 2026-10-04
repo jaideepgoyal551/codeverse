@@ -453,23 +453,15 @@ const Dashboard = () => {
           <ProfileSection
             displayUser={displayUser}
             connectedPlatforms={connectedPlatforms}
+            codeforcesStats={platformStats.codeforces}
             isOwnProfile={isOwnProfile}
             navigate={navigate}
             getPlatformUrl={getPlatformUrl}
           />
 
-          <div className="grid grid-cols-12 gap-4 sm:gap-5">
-            <div className="col-span-12 lg:col-span-8 space-y-4 sm:space-y-5">
-              <div className="grid gap-4 xl:grid-cols-[1.2fr_0.8fr]">
-            <StatsRow totalProblems={totalProblems} activeDays={contributionCalendar?.stats?.activeDays || userData?.totals?.activeDays || 0} />
-                <ContestsSection totalContests={totalContests} contestsByPlatform={contestsByPlatform} PlatformIcon={PlatformIcon} getPlatformColor={getPlatformColor} />
-              </div>
-
-              <div className="dashboard-card dashboard-heatmap-card">
-              <ContributionCalendar calendarData={contributionCalendar} connectedPlatforms={connectedPlatforms} />
-              </div>
-
-              <div className="grid gap-4 xl:grid-cols-[1.35fr_0.9fr]">
+          <div className="dashboard-layout">
+            <main className="dashboard-primary">
+              <div className="dashboard-primary-grid">
                 <Suspense fallback={<div className="dashboard-card flex h-64 items-center justify-center text-gray-500">Loading chart...</div>}>
                   <RatingChart 
                     ratingHistory={ratingHistory}
@@ -483,26 +475,35 @@ const Dashboard = () => {
                 <ProblemsBreakdown platformStats={platformStats} dsaProblems={dsaProblems} cpProblems={cpProblems} PLATFORM_CONFIG={PLATFORM_CONFIG} PlatformIcon={PlatformIcon} />
               </div>
 
+              <div className="dashboard-card dashboard-heatmap-card">
+                <ContributionCalendar calendarData={contributionCalendar} connectedPlatforms={connectedPlatforms} />
+              </div>
+
+              <div className="dashboard-activity-grid">
+                <StatsRow totalProblems={totalProblems} activeDays={contributionCalendar?.stats?.activeDays || userData?.totals?.activeDays || 0} />
+                <ContestsSection totalContests={totalContests} contestsByPlatform={contestsByPlatform} PlatformIcon={PlatformIcon} getPlatformColor={getPlatformColor} />
+              </div>
+
               <div 
                 onClick={() => navigate('/sheets')}
                 className="dashboard-promo-card cursor-pointer transition-all"
               >
                 <div className="flex items-center gap-4">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#22c55e] text-[#06100a]">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#FFA116] text-[#171717]">
                     <BookOpen className="h-5 w-5" />
                   </div>
                   <div className="flex-1">
                     <h3 className="text-base font-semibold text-white">DSA Sheets</h3>
                     <p className="text-sm text-gray-400">Keep your progress moving with a structured problem roadmap.</p>
                   </div>
-                  <ChevronRight className="h-5 w-5 text-[#4ade80]" />
+                  <ChevronRight className="h-5 w-5 text-[#FFA116]" />
                 </div>
               </div>
 
               <TopicAnalysisSection topicAnalysis={topicAnalysis} navigate={navigate} PLATFORM_CONFIG={PLATFORM_CONFIG} PlatformIcon={PlatformIcon} />
-            </div>
+            </main>
 
-            <aside className="col-span-12 space-y-4 lg:col-span-4 sm:space-y-5">
+            <aside className="dashboard-aside">
               <SyncButtonSection isOwnProfile={isOwnProfile} syncing={syncing} cooldownRemaining={cooldownRemaining} handleSync={handleSync} formatCooldown={formatCooldown} SYNC_COOLDOWN_MS={SYNC_COOLDOWN_MS} getSyncKey={getSyncKey} />
               <QuickLinksSection navigate={navigate} />
             </aside>
@@ -514,7 +515,29 @@ const Dashboard = () => {
 
 // ============== Extracted Dashboard Sub-Components ==============
 
-const ProfileSection = React.memo(({ displayUser, connectedPlatforms, isOwnProfile, navigate, getPlatformUrl }) => (
+const getCodeforcesRankLabel = (stats = {}) => {
+  const rank = typeof stats.rank === 'string' ? stats.rank.trim() : '';
+  if (rank && rank.toLowerCase() !== 'unrated') {
+    return rank.replace(/\b\w/g, character => character.toUpperCase());
+  }
+
+  const rating = Number(stats.rating) || 0;
+  if (rating < 1200) return null;
+  if (rating < 1400) return 'Pupil';
+  if (rating < 1600) return 'Specialist';
+  if (rating < 1900) return 'Expert';
+  if (rating < 2100) return 'Candidate Master';
+  if (rating < 2300) return 'Master';
+  if (rating < 2400) return 'International Master';
+  if (rating < 2600) return 'Grandmaster';
+  if (rating < 3000) return 'International Grandmaster';
+  return 'Legendary Grandmaster';
+};
+
+const ProfileSection = React.memo(({ displayUser, connectedPlatforms, codeforcesStats, isOwnProfile, navigate, getPlatformUrl }) => {
+  const codeforcesRank = getCodeforcesRankLabel(codeforcesStats);
+
+  return (
   <section className="dashboard-profile-card">
     <div className="dashboard-profile-top">
       <div className="flex min-w-0 items-center gap-4">
@@ -530,6 +553,11 @@ const ProfileSection = React.memo(({ displayUser, connectedPlatforms, isOwnProfi
             <h2 className="truncate text-xl font-bold text-white">{displayUser?.fullName || 'Coder'}</h2>
             <span className="text-amber-300" aria-label="Verified profile">★</span>
             <span className="text-sm" aria-label="Active">🟢</span>
+            {codeforcesRank && (
+              <span className="dashboard-rank-badge" title="Codeforces rank">
+                Codeforces · {codeforcesRank}
+              </span>
+            )}
           </div>
           <p className="mt-1 text-sm text-gray-400">@{displayUser?.username || 'coder'}</p>
           <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-gray-400">
@@ -552,8 +580,13 @@ const ProfileSection = React.memo(({ displayUser, connectedPlatforms, isOwnProfi
 
     <div className="dashboard-platforms">
       {connectedPlatforms.length > 0 ? connectedPlatforms.map(platform => {
-        const count = platform.stats.totalSolved || platform.stats.problemsSolved || 0;
-        const rating = platform.stats.rating || platform.stats.currentRating;
+        const stats = platform.stats || {};
+        const isGithub = platform.key === 'github';
+        const count = Number(isGithub
+          ? (stats.totalContributions || stats.allTimeContributions || stats.contributions || 0)
+          : (stats.totalSolved || stats.problemsSolved || 0));
+        const rating = Number(stats.rating || stats.currentRating || 0);
+        const maxRating = Number(stats.maxRating || rating || 0);
         return (
           <a
             key={platform.key}
@@ -562,15 +595,32 @@ const ProfileSection = React.memo(({ displayUser, connectedPlatforms, isOwnProfi
             rel="noopener noreferrer"
             className="dashboard-platform-card"
           >
-            <div className="dashboard-platform-icon">
-              <PlatformIcon platform={platform.key} className="h-6 w-6" color={platform.color} />
+            <div className="dashboard-platform-card-heading">
+              <div className="dashboard-platform-icon">
+                <PlatformIcon platform={platform.key} className="h-6 w-6" color={platform.color} />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-medium text-gray-200">{platform.name}</p>
+                <p className="truncate text-[11px] text-gray-500">@{platform.username}</p>
+              </div>
+              <ChevronRight className="h-4 w-4 shrink-0 text-gray-500" />
             </div>
-            <div className="min-w-0 flex-1">
-              <p className="truncate text-xs text-gray-400">{platform.name}</p>
-              <p className="mt-1 text-xl font-bold text-white">{rating ? Number(rating).toLocaleString() : Number(count).toLocaleString()}</p>
-              <p className="mt-1 text-[10px] text-gray-500">{rating ? 'Current rating' : 'Problems solved'}</p>
+            {rating > 0 && (
+              <div className="dashboard-platform-rating">
+                <div>
+                  <span>Rating</span>
+                  <strong>{rating.toLocaleString()}</strong>
+                </div>
+                <div>
+                  <span>Max rating</span>
+                  <strong>{maxRating.toLocaleString()}</strong>
+                </div>
+              </div>
+            )}
+            <div className="dashboard-platform-solved">
+              <strong>{count.toLocaleString()}</strong>
+              <span>{isGithub ? 'Contributions' : 'Questions solved'}</span>
             </div>
-            <ChevronRight className="h-4 w-4 text-gray-500" />
           </a>
         );
       }) : (
@@ -580,7 +630,8 @@ const ProfileSection = React.memo(({ displayUser, connectedPlatforms, isOwnProfi
       )}
     </div>
   </section>
-));
+  );
+});
 
 const StatsRow = React.memo(({ totalProblems, activeDays }) => (
   <div className="grid grid-cols-2 gap-3 sm:gap-4">
@@ -751,7 +802,7 @@ const SyncButtonSection = React.memo(({ isOwnProfile, syncing, cooldownRemaining
         className={`w-full font-semibold py-3 rounded-lg flex items-center justify-center gap-2 transition-colors ${
           cooldownRemaining > 0
             ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
-            : 'bg-[#22c55e] hover:bg-[#4ade80] disabled:bg-[#22c55e]/50 text-[#06100a]'
+            : 'bg-[#FFA116] hover:bg-[#ffb84d] disabled:bg-[#FFA116]/50 text-[#171717]'
         }`}
       >
         <RefreshCw className={`w-5 h-5 ${syncing ? 'animate-spin' : ''}`} />
@@ -763,7 +814,7 @@ const SyncButtonSection = React.memo(({ isOwnProfile, syncing, cooldownRemaining
       </button>
       {cooldownRemaining > 0 && (
         <div className="w-full bg-gray-800 rounded-full h-1.5 overflow-hidden">
-          <div className="h-full bg-[#22c55e]/60 rounded-full transition-all duration-1000"
+          <div className="h-full bg-[#FFA116]/60 rounded-full transition-all duration-1000"
             style={{ width: `${((SYNC_COOLDOWN_MS / 1000 - cooldownRemaining) / (SYNC_COOLDOWN_MS / 1000)) * 100}%` }}
           />
         </div>
@@ -808,4 +859,3 @@ const getPlatformUrl = (platform, username) => {
 };
 
 export default Dashboard;
-
