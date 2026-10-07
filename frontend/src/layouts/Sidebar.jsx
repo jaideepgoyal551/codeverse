@@ -102,7 +102,7 @@ const Sidebar = ({ isOpen, onClose, onToggle }) => {
       className={({ isActive }) => `
         flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200
         ${isActive 
-          ? 'bg-[#22c55e]/12 text-[#4ade80] shadow-[inset_2px_0_0_#22c55e]' 
+          ? 'bg-[#ffa116]/10 text-[#ffb84d] shadow-[inset_2px_0_0_#ffa116]'
           : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-[#1a1a2e] hover:text-gray-900 dark:hover:text-gray-200'
         }
       `}
@@ -188,9 +188,9 @@ const Sidebar = ({ isOpen, onClose, onToggle }) => {
             {/* Rank Card */}
             <NavLink
               to="/leaderboard"
-              className="flex items-center gap-3 p-2.5 rounded-lg bg-[#22c55e]/[0.06] border border-[#22c55e]/20 hover:border-[#22c55e]/40 transition-all"
+              className="flex items-center gap-3 p-2.5 rounded-lg bg-[#ffa116]/[0.06] border border-[#ffa116]/20 hover:border-[#ffa116]/40 transition-all"
             >
-              <Trophy className="w-4 h-4 text-[#4ade80] flex-shrink-0" />
+              <Trophy className="w-4 h-4 text-[#ffb84d] flex-shrink-0" />
               <div className="flex-1 min-w-0">
                 <div className="text-[10px] text-gray-500 dark:text-gray-500 uppercase tracking-wider">Rank</div>
                 <div className="text-sm font-bold text-gray-900 dark:text-white truncate">
@@ -200,7 +200,7 @@ const Sidebar = ({ isOpen, onClose, onToggle }) => {
               {userRank && (
                 <div className="text-right flex-shrink-0">
                   <div className="text-[10px] text-gray-500 dark:text-gray-500">Score</div>
-                  <div className="text-sm font-bold text-[#4ade80]">{userRank.cScore}</div>
+                  <div className="text-sm font-bold text-[#ffb84d]">{userRank.cScore}</div>
                 </div>
               )}
             </NavLink>

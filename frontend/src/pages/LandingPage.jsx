@@ -87,8 +87,8 @@ const LandingPage = () => {
               <Link to="/register" className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-500 px-6 py-3.5 text-base font-semibold text-white shadow-[0_0_30px_rgba(139,92,246,0.45)] transition hover:scale-[1.02]">
                 Explore Dashboard <ArrowRight className="h-4 w-4" />
               </Link>
-              <Link to="/login" className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-6 py-3.5 text-base font-semibold text-white transition hover:border-violet-400/40 hover:bg-violet-500/5">
-                <BarChart3 className="h-4 w-4" /> View Problems
+              <Link to="/dashboard" className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-6 py-3.5 text-base font-semibold text-white transition hover:border-violet-400/40 hover:bg-violet-500/5">
+                <BarChart3 className="h-4 w-4" /> View Demo
               </Link>
             </div>
           </div>

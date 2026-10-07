@@ -1287,3 +1287,269 @@ body {
     transition-duration: 0.01ms !important;
   }
 }
+
+:root {
+  color-scheme: dark;
+  --ui-canvas: #1a1a1a;
+  --ui-surface: #232323;
+  --ui-surface-raised: #2b2b2b;
+  --ui-border: #3b3b3b;
+  --ui-text: #eff1f6;
+  --ui-muted: #a1a1a1;
+  --ui-accent: #ffa116;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+  background: var(--ui-canvas);
+}
+
+body {
+  color: var(--ui-text);
+  font-family: Inter, "Segoe UI", sans-serif;
+  background: var(--ui-canvas);
+}
+
+.dashboard-app,
+.dashboard-main,
+.dashboard-page {
+  background: var(--ui-canvas) !important;
+}
+
+.dashboard-sidebar {
+  background: var(--ui-surface) !important;
+  border-color: var(--ui-border) !important;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.dashboard-topbar {
+  background: var(--ui-surface);
+  border-color: var(--ui-border);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.dark [class*="dark:bg-[#0d0d14]"] {
+  background-color: var(--ui-canvas) !important;
+}
+
+.dark [class*="dark:bg-[#16161f]"] {
+  background-color: var(--ui-surface) !important;
+}
+
+.dark [class*="dark:bg-[#1a1a2e]"],
+.dark [class*="dark:bg-[#252538]"] {
+  background-color: var(--ui-surface-raised) !important;
+}
+
+.dark [class*="dark:border-gray-"] {
+  border-color: var(--ui-border) !important;
+}
+
+.dark [class*="dark:bg-[#16161f]"][class*="rounded-xl"] {
+  border-radius: 8px;
+}
+
+.dashboard-search {
+  border-color: var(--ui-border);
+  border-radius: 6px;
+  background: var(--ui-surface-raised);
+  box-shadow: none;
+}
+
+.dashboard-page {
+  --dashboard-surface: var(--ui-surface);
+  --dashboard-surface-raised: var(--ui-surface-raised);
+  --dashboard-border: var(--ui-border);
+  --dashboard-muted: var(--ui-muted);
+  --dashboard-orange: var(--ui-accent);
+  color: var(--ui-text);
+}
+
+.dashboard-page .dashboard-card,
+.dashboard-page .dashboard-profile-card,
+.dashboard-page .dashboard-platform-card,
+.dashboard-page .dashboard-rating-chart-compact {
+  border-color: var(--ui-border);
+  border-radius: 8px;
+  background: var(--ui-surface);
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.dashboard-page .dashboard-card::before,
+.dashboard-page .dashboard-profile-card::before {
+  display: none;
+}
+
+.dashboard-page .dashboard-card:hover,
+.dashboard-page .dashboard-platform-card:hover {
+  transform: none;
+  border-color: #555;
+  background: var(--ui-surface-raised);
+  box-shadow: none;
+}
+
+.dashboard-page .dashboard-platform-card {
+  min-height: 140px;
+}
+
+.dashboard-page .dashboard-rank-badge,
+.dashboard-page .dashboard-platform-rank {
+  border-color: rgba(255, 161, 22, 0.3);
+  border-radius: 4px;
+  background: rgba(255, 161, 22, 0.1);
+  color: #ffbd66 !important;
+  box-shadow: none;
+}
+
+.dashboard-page .dashboard-profile-total {
+  border-color: rgba(255, 161, 22, 0.3);
+  border-radius: 6px;
+  background: rgba(255, 161, 22, 0.08);
+  box-shadow: none;
+}
+
+.dashboard-page .dashboard-avatar,
+.dashboard-page .dashboard-platform-icon {
+  border-radius: 8px;
+  background: #303030;
+  box-shadow: none;
+}
+
+.dashboard-page .dashboard-platform-card:hover .dashboard-platform-icon {
+  background: #383838;
+}
+
+.dashboard-page .dashboard-stat-card::after {
+  display: none;
+}
+
+.dashboard-page button:focus-visible,
+.dashboard-page a:focus-visible,
+.dashboard-sidebar a:focus-visible,
+.dashboard-topbar button:focus-visible {
+  outline: 2px solid var(--ui-accent);
+  outline-offset: 2px;
+}
+
+.landing-page-shell {
+  overflow: hidden;
+  background: var(--ui-canvas);
+}
+
+.landing-bg {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+  background-size: 40px 40px;
+  filter: none;
+  mask-image: linear-gradient(to bottom, black, transparent 82%);
+}
+
+.landing-page-shell [class*="violet"],
+.landing-page-shell [class*="purple"],
+.landing-page-shell [class*="indigo"] {
+  border-color: rgba(255, 161, 22, 0.24);
+  color: #ffbd66;
+}
+
+.landing-page-shell [class*="bg-gradient-to-r"] {
+  background-image: none;
+  color: var(--ui-accent);
+  -webkit-text-fill-color: currentColor;
+}
+
+.landing-page-shell a[class*="bg-gradient-to-r"] {
+  border: 1px solid var(--ui-accent);
+  border-radius: 6px;
+  background: var(--ui-accent);
+  color: #1a1a1a;
+  -webkit-text-fill-color: currentColor;
+  box-shadow: none;
+}
+
+.landing-page-shell a[class*="bg-gradient-to-r"]:hover {
+  background: #ffb84d;
+  transform: translateY(-1px);
+}
+
+.landing-page-shell header {
+  background: rgba(26, 26, 26, 0.94);
+  backdrop-filter: blur(12px);
+}
+
+.landing-page-shell header a:not([class*="bg-gradient-to-r"]) {
+  border-radius: 6px;
+}
+
+.hero-orbit,
+.pulse-ring,
+.orbital-panel::before {
+  display: none;
+}
+
+.orbital-panel {
+  border-color: var(--ui-border);
+  border-radius: 8px;
+  background: #242424;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.28);
+  transform: none;
+}
+
+.platform-chip {
+  border-color: var(--ui-border);
+  border-radius: 6px;
+  background: #303030;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+.code-square {
+  border-radius: 8px;
+  background: #303030;
+  box-shadow: none;
+}
+
+.code-square-inner .slash-left,
+.code-square-inner .slash-right {
+  background: linear-gradient(180deg, #ffbd66, #ffa116);
+  box-shadow: none;
+}
+
+.landing-page-shell section.rounded-\[26px\],
+.landing-page-shell .feature-card {
+  border-color: var(--ui-border);
+  border-radius: 8px;
+  background: var(--ui-surface);
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+.landing-page-shell .feature-card h3 {
+  font-size: 1.2rem;
+}
+
+.landing-page-shell button:focus-visible,
+.landing-page-shell a:focus-visible {
+  outline: 2px solid var(--ui-accent);
+  outline-offset: 3px;
+}
+
+@media (max-width: 640px) {
+  .dashboard-topbar > div {
+    gap: 8px;
+  }
+
+  .landing-page-shell h1 {
+    font-size: clamp(2.5rem, 12vw, 3.5rem);
+  }
+
+  .landing-page-shell .orbital-panel {
+    transform: scale(0.94);
+  }
+}
